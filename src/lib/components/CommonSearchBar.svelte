@@ -1,0 +1,75 @@
+<script>
+	import { clsx } from 'clsx';
+    import Button from './ui/button/button.svelte';
+    import Input from './ui/input/input.svelte';
+	export { className as class };
+    
+	/**
+	 * @type {string}
+	 */
+	 export let inpVal;
+	let className = '';
+	let recording = false;
+	const plusClicked = ()=>{
+		console.log('inside function');
+	};
+	const micClicked = ()=>{
+		recording=true;
+	};
+	const sentClicked=()=>{
+
+	}
+</script>
+
+<div class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}>
+	<Button
+		size="icon"
+		on:click={plusClicked}
+		class={clsx(
+			'flex bg-[#4caf50] m-2 pb-2 px-4 rounded-full text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] '
+		)}
+		>+
+	</Button>
+	<Input
+		class={clsx(
+			'sm:pl-10 sm:pr-12 px-10 w-[90%] rounded-[21px] h-[42px] bg-white shadow-[0px_3px_3.2px_0px_#D2D2D224] text-[#607D8B] leading-4 items-center text-[14px]'
+		)}
+		placeholder="Type here ..."
+		bind:value={inpVal}
+	/>
+	<Button class="bg-transparent absolute sm:mr-[75%] mr-[55%]" on:click={micClicked} >
+		<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M8.14286 1.35715C7.60296 1.35715 7.08516 1.57162 6.70339 1.95339C6.32162 2.33516 6.10715 2.85296 6.10715 3.39286V8.14286C6.10715 8.68277 6.32162 9.20056 6.70339 9.58233C7.08516 9.9641 7.60296 10.1786 8.14286 10.1786C8.68277 10.1786 9.20056 9.9641 9.58233 9.58233C9.9641 9.20056 10.1786 8.68277 10.1786 8.14286V3.39286C10.1786 2.85296 9.9641 2.33516 9.58233 1.95339C9.20056 1.57162 8.68277 1.35715 8.14286 1.35715Z"
+				stroke="#69818C"
+				stroke-width="1.01786"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path
+				d="M12.8929 6.78572V8.14286C12.8929 9.40264 12.3924 10.6108 11.5016 11.5016C10.6108 12.3924 9.40263 12.8929 8.14285 12.8929C6.88307 12.8929 5.67489 12.3924 4.7841 11.5016C3.8933 10.6108 3.39285 9.40264 3.39285 8.14286V6.78572"
+				stroke="#69818C"
+				stroke-width="1.01786"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path
+				d="M8.14285 12.8929V14.9286"
+				stroke="#69818C"
+				stroke-width="1.01786"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+		</svg>
+	</Button>
+	<Button class="bg-transparent absolute sm:ml-[85%] ml-[85%]" on:click={sentClicked}>
+		<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				d="M9.41254 0.286905L22.2984 6.47173C24.3113 7.43791 24.3113 10.1955 22.2983 11.1617L9.41254 17.3465C7.1207 18.4465 4.6547 16.1844 5.69537 13.9367L7.5729 9.88149C7.60912 9.80326 7.64116 9.72375 7.66902 9.64326L12.3343 9.64327C12.8096 9.64327 13.1948 9.2732 13.1948 8.8167C13.1948 8.3602 12.8096 7.99013 12.3343 7.99013L7.66902 7.99013C7.64116 7.90964 7.60912 7.83013 7.5729 7.7519L5.69537 3.69667C4.6547 1.44896 7.12071 -0.81311 9.41254 0.286905ZM0 6.61252C0 6.15602 0.385274 5.78596 0.860534 5.78596H3.15529C3.63055 5.78596 4.01583 6.15602 4.01583 6.61252C4.01583 7.06902 3.63055 7.43909 3.15529 7.43909H0.860534C0.385274 7.43909 0 7.06902 0 6.61252ZM0.860534 10.194C0.385274 10.194 0 10.5641 0 11.0206C0 11.4771 0.385274 11.8472 0.860534 11.8472H3.15529C3.63055 11.8472 4.01583 11.4771 4.01583 11.0206C4.01583 10.5641 3.63055 10.194 3.15529 10.194H0.860534Z"
+				fill="#4CAF50"
+			/>
+		</svg>
+	</Button>
+</div>
