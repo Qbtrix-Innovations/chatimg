@@ -1,7 +1,8 @@
 import { writable } from 'svelte/store';
-import { auth, db, googleProvider } from '../services/firebase/firebase';
+import { auth, db, googleProvider } from '../../services/firebase/firebase';
 import { collection, doc, setDoc, getDoc, addDoc, Timestamp } from 'firebase/firestore';
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updatePassword, updateProfile } from 'firebase/auth';
+import { userData } from '../user/userStore';
 /**
  * Svelte store to hold the Authentication Information.
  */
@@ -14,38 +15,6 @@ export const authStore = writable({
      * @type {import('firebase/auth').User|null}
      */
     currentUser: null,
-    /**
-     * @type {{
-     *          userName:string,
-     *          email:string,
-     *          phoneNumber:string|null,
-     *          dateOfBirth:Date|null,
-     *          profilePictureUrl:string|null,
-     *          createdAt:Date|null,
-     *          lastLogin:Date|null, 
-     *          isPremium:boolean,
-     *          subscriptionDetails:{
-     *                                  startDate:Date|null,
-     *                                  endDate:Date|null,
-     *                                  planType:'basic'|'premium'
-     *                               }
-     *          }}
-     */
-    userInfo: {
-        userName: '',
-        email: '',
-        phoneNumber: null,
-        dateOfBirth: null,
-        profilePictureUrl: null,
-        createdAt: null,
-        lastLogin: null,
-        isPremium: false,
-        subscriptionDetails: {
-            startDate: null,
-            endDate: null,
-            planType: 'basic',
-        }
-    }
 });
 
 export const authHandlers = {
@@ -59,58 +28,82 @@ export const authHandlers = {
          *          phoneNumber: null; 
          *          dateOfBirth: Date|null; 
          *          profilePictureUrl: null; 
-         * }} */ 
-        userData
+         * }} */
+        userInfoData
     ) => {
         try {
             let userCredentials = await createUserWithEmailAndPassword(auth, email, password);
             let finalDay = new Date();
             finalDay.setMonth(finalDay.getMonth() + 6);
             // set the user doc
-            await setDoc(doc(db, 'users', userCredentials.user.uid), {
-                username: userData.username,
-                email: userData.email,
-                phoneNumber: userData.phoneNumber || null,
-                dateOfBirth: userData.dateOfBirth!==null ? Timestamp.fromDate(userData.dateOfBirth) : null,
-                profilePictureUrl: userData.profilePictureUrl || null,
+            /**
+            * @type {{
+            *          id:string,
+            *          userName:string,
+            *          email:string,
+            *          phoneNumber:string,
+            *          dateOfBirth:Date|null|Timestamp,
+            *          profilePictureUrl:string,
+            *          createdAt:Date|null|Timestamp,
+            *          lastLogin:Date|null|Timestamp, 
+            *          isPremium:boolean,
+            *          subscriptionDetails:{
+            *                                  startDate:Date|null|Timestamp,
+            *                                  endDate:Date|null|Timestamp,
+            *                                  planType:"basic"|"premium"
+            *                               }
+            *          }}
+            */
+            const userDoc = {
+                id: userCredentials.user.uid,
+                userName: userInfoData.username,
+                email: userInfoData.email,
+                phoneNumber: userInfoData.phoneNumber !== null ? userInfoData.phoneNumber : '',
+                dateOfBirth: userInfoData.dateOfBirth !== null ? Timestamp.fromDate(userInfoData.dateOfBirth) : null,
+                profilePictureUrl: userInfoData.profilePictureUrl !== null ? userInfoData.profilePictureUrl : '',
                 createdAt: Timestamp.fromDate(new Date()),
                 lastLogin: Timestamp.fromDate(new Date()),
                 isPremium: false,
                 subscriptionDetails: {
                     startDate: Timestamp.fromDate(new Date()),
                     endDate: Timestamp.fromDate(finalDay),
-                    planType: 'basic',
+                    planType: "basic",
                 },
-            });
+            };
+            await setDoc(doc(db, 'users', userCredentials.user.uid), userDoc);
             // get the user doc
-            const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
-            console.log(userDoc.data());
+            // const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
+            console.log(userDoc);
             // update it in the store
-            // @ts-ignore
-            authStore.update((currState) => ({ ...currState, userInfo: userDoc.data() ,currentUser:userCredentials.user}));
-            /**
-             * DON'T under any circumstances move the updateProfile function above . 
-             * If it runs before setDoc and get Doc and authstore.update
-             * then the onMount function which subscribes to auth(from firebase getAuth) store only when auth's state changes will run 
-             * and this will then trigger the if condition present in handleAuth function present at Auth route 
-             * which will open a new page of NewChat before the user is created in firestore database . 
-             * because of this a new user is created in firebase authentication but not in firestore.
-             */
+            userData.set(userDoc);
+            authStore.update((currState) => ({ ...currState, currentUser: userCredentials.user }));
             // update the profile to include userName
             await updateProfile(userCredentials.user, { displayName: name });
             // reload the user to get updated user
             await userCredentials.user.reload();
-            return userCredentials;
+            return userDoc;
         } catch (error) {
             console.log(error);
         }
     },
-    login: async (/** @type {string} */ email, /** @type {string} */ password) => {
+    login: async (
+        /** @type {string} */ email,
+        /** @type {string} */ password,
+        /** @type {any} */ name,
+        /** @type {{ 
+         *          username: string; 
+         *          email: string; 
+         *          phoneNumber: null; 
+         *          dateOfBirth: Date|null; 
+         *          profilePictureUrl: null; 
+         * }} */
+        userInfoData) => {
         try {
             let userCredentials = await signInWithEmailAndPassword(auth, email, password);
             const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
             // @ts-ignore
-            authStore.update((currState) => ({ ...currState, userInfo: userDoc.data() ,currentUser:userCredentials.user}));
+            userData.set(userDoc.data());
+            authStore.update((currState) => ({ ...currState,currentUser: userCredentials.user }));
         } catch (error) {
             console.log(error);
         }

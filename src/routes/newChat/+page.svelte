@@ -3,12 +3,13 @@
 	import CommonSearchBar from '$lib/components/CommonSearchBar.svelte';
     import Button from '$lib/components/ui/button/button.svelte';
     import { clsx } from 'clsx';
-	import { authStore } from '../../lib/stores/authStore';
 	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 	import Input from '$lib/components/ui/input/input.svelte';
-    import Modal from './components/Modal.svelte';
-	import { app, db } from '../../lib/services/firebase/firebase';
+    import Modal from '../../lib/components/Modal.svelte';
+	import { app, auth, db } from '../../lib/services/firebase/firebase';
 	import { addDoc, collection, getDoc, doc, setDoc } from 'firebase/firestore';
+	import { authStore } from '$lib/stores/userauth/authStore';
+	import { userData } from '$lib/stores/user/userStore';
 
 	/**
 	 * @type {string | null | undefined}
@@ -26,6 +27,7 @@
 	 */
 	let uid;
 	$: uid = $authStore?.currentUser?.uid;
+	let userDataInstance = $userData;
 	/**
 	 * @type {any}
 	 */
@@ -96,7 +98,7 @@
 
 <div class="bg-[#f5f5f5] h-screen flex flex-col">
 	<div class="font-semibold text-[14px] text-[#263238] mt-2 ml-4">
-		Chat Img Hi {userName?.split(' ')[0]} ! CreatedAt: {$authStore.userInfo.userName}
+		Chat Img Hi {userName?.split(' ')[0]} ! CreatedAt: {$userData.createdAt}
 	</div>
 	<div class="mt-[70%] h-1/2 flex flex-col">
 		<div class="flex items-center justify-center active:scale-[85%] transition-transform">

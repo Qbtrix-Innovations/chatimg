@@ -1,29 +1,20 @@
 <script>
-	import { authHandlers, authStore } from './../../lib/stores/authStore.js';
-    import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import { authHandlers,authStore } from '$lib/stores/userauth/authStore';
 	import { clsx } from 'clsx';
 	import TextInput from './components/TextInput.svelte';
-	// import CustomButton from '../../lib/components/customisedComponents/CustomButton.svelte';
 	import ExternalLoginButton from './components/ExternalLoginButton.svelte';
-	// import LoginButton from './LoginButton.svelte';
 	import Button from './../../lib/components/ui/button/button.svelte';
-	import { onMount } from 'svelte';
-	import { auth, db } from '../../lib/services/firebase/firebase.js';
-	import { Timestamp, doc, getDoc, setDoc } from 'firebase/firestore';
-	// onMount(() => {
-	// 	const unsubscribe = auth.onAuthStateChanged((user) => {
-	// 		// console.log(user);
-	// 		authStore.update((curr) => {
-	// 			return { ...curr, isLoading: false, currentUser: user };
-	// 		});
-	// 	});
-	// });
+	import Modal from '$lib/components/Modal.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import { goto } from '$app/navigation';
 	let fullName = '';
 	let email = '';
 	let password = '';
 	let confirmPassword = '';
 	let isChecked = false;
 	let register = true;
+	let reset=false;
+	let emailForPasswordReset='';
 	let svg_inp = `<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
 				d="M14.7558 16.0848V14.6093C14.7558 13.8266 14.4449 13.0759 13.8914 12.5225C13.338 11.969 12.5873 11.6581 11.8046 11.6581H5.90232C5.11962 11.6581 4.36899 11.969 3.81554 12.5225C3.26209 13.0759 2.95116 13.8266 2.95116 14.6093V16.0848"
@@ -50,7 +41,9 @@
 							<path d="M10.264 16.9077C12.4315 16.9077 14.4009 16.148 15.89 14.9126L13.2929 12.8998C12.4221 13.5063 11.358 13.8343 10.264 13.8335C8.08139 13.8335 6.22815 12.5589 5.52999 10.7802L2.79356 12.7111C4.18234 15.2 7.00268 16.9077 10.264 16.9077Z" fill="#4CAF50"/>
 							<path d="M18.4921 7.7172H17.8162V7.6853H10.264V10.7594H15.0064C14.6754 11.6111 14.0793 12.3553 13.2916 12.9002L13.2928 12.8994L15.89 14.9122C15.7062 15.0651 18.6554 13.065 18.6554 9.22236C18.6554 8.70706 18.5975 8.20406 18.4921 7.7172Z" fill="#1976D2"/>
 						</svg>`;
-	const resetPasswordHandler = async () => {};
+	const resetPasswordHandler = async () => {
+    	reset=true;
+	};
 	const handleSubmit = (/** @type {any} */ e) => {
 		e.preventDefault();
 		// checking that all fields are filled
@@ -69,42 +62,7 @@
          		        	dateOfBirth: null,
          		        	profilePictureUrl: null 
 						};
-
-					authHandlers.signup(email, password, fullName);
-					// try {
-					// 	const func = async()=>{
-					// 		let finalDay = new Date();
-            		// 		finalDay.setMonth(finalDay.getMonth() + 6);
-            		// 		// set the user doc
-					// 		if(userCredentials){
-					// 			console.log('chala');
-            		// 		await setDoc(doc(db, 'users', userCredentials.user.uid), {
-            		// 		    username: userData.username,
-            		// 		    email: userData.email,
-            		// 		    phoneNumber: userData.phoneNumber || null,
-            		// 		    dateOfBirth: userData.dateOfBirth!==null ? Timestamp.fromDate(userData.dateOfBirth) : null,
-            		// 		    profilePictureUrl: userData.profilePictureUrl || null,
-            		// 		    createdAt: Timestamp.fromDate(new Date()),
-            		// 		    lastLogin: Timestamp.fromDate(new Date()),
-            		// 		    isPremium: false,
-            		// 		    subscriptionDetails: {
-            		// 		        startDate: Timestamp.fromDate(new Date()),
-            		// 		        endDate: Timestamp.fromDate(finalDay),
-            		// 		        planType: 'basic',
-            		// 		    },
-            		// 		});
-            		// 		// get the user doc
-            		// 		const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
-            		// 		console.log(userDoc.data());
-            		// 		// update it in the store
-            		// 		// @ts-ignore
-            		// 		authStore.update((currState) => ({ ...currState, userInfo: userDoc.data() ,currentUser:userCredentials.user}));
-					// 	}
-					// 	}
-					// 	func()
-					// } catch (error) {
-					// 	console.log(error);
-					// }
+					authHandlers.signup(email, password,fullName,userData);
 				} else {
 					alert('Please accept the terms and conditions');
 					return;
@@ -113,23 +71,27 @@
 			// login
 			else {
 				try {
-					authHandlers.login(email, password);
+					const userData={
+							username: fullName, 
+         		        	email: email,
+         		        	phoneNumber: null, 
+         		        	dateOfBirth: null,
+         		        	profilePictureUrl: null 
+						};
+					authHandlers.login(email, password,fullName,userData);
 				} catch (error) { 
 					console.log(error);
 				}
 			}
 		}
-		if ($authStore.userInfo.userName!==null && register) {
-			console.log($authStore.userInfo);
-			window.location.href = '/NewChat';
-		}
-		if ($authStore.userInfo.userName!==null && !register) {
-			console.log($authStore.userInfo);
-			
-			window.location.href = '/Home';
-		}
-
 	};
+	const handleForgotPassword=async()=>{
+		const res = await authHandlers.resetPassword(emailForPasswordReset);
+		alert('email sent successfully.');
+		reset=false;
+		emailForPasswordReset='';
+		goto('/auth');
+}
 </script>
 
 <div class="bg-[#f5f5f5] h-screen">
@@ -274,6 +236,14 @@
 					>Reset Password</button
 				>
 			</div>
+			<Modal  bind:showModal={reset}>
+				<h1 slot="header" class="text-transparent bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]">Forgot Password ?</h1>
+				<div class="m-2">
+				<p class="text-sm p-2 m-2" >Enter your email below and get a link to reset your password.</p>
+				<Input bind:value={emailForPasswordReset} />
+				</div>
+			 	<Button on:click={handleForgotPassword} type='submit' slot='footer'class='mt-2 rounded-2xl border-[1px] border-[#c8c8c8] bg-gradient-to-t from-[rgba(76,175,80,1)] to-[rgba(100,197,104,0.43)] shadow-[0px_4px_3.7px_0px_rgba(0, 0, 0, 0.22)]' >Send Link</Button>
+			</Modal>
 		</div>
 	</div>
 </div>
