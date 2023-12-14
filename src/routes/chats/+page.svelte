@@ -4,7 +4,7 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
     import { Button } from '$lib/components/ui/button';
     import CommonNavbar from '$lib/components/CommonNavbar.svelte'
-    import CommonSearchBar from '$lib/components/CommonSearchBar.svelte'
+    import CommonMessageBar from '$lib/components/CommonMessageBar.svelte'
     import { onMount } from 'svelte';
 	let loading = false;
 	onMount(()=>{
@@ -62,7 +62,7 @@
 <div class={clsx('bg-[#f5f5f5] h-[100vh]')}>
 	<div class={clsx('flex flex-col w-screen justify-between items-center')}>
 		<div class={clsx('flex flex-col w-full items-center')}>
-			<CommonNavbar headingLeft='File name goes here ...' buttonTextRight="New" shareAvailable='true' />
+			<CommonNavbar  headingLeft='File name goes here ...' buttonTextRight="New" shareAvailable='true' />
 			<hr class={clsx('bg-[#ededed] mt-[12%] fixed border-[1px] border-solid border-[#ededed] w-full')} />
 			{#if loading}
 				<Skeleton class={clsx('w-[85%] fixed mt-[15%] h-[25%] rounded-[8px] bg-[#d9d9d9] self-center')} />
@@ -160,6 +160,6 @@
 				{/if}
 			</div>
 		</div>
-		<CommonSearchBar bind:inpVal={searchVal} class='mt-[92vh]'/>
+		<CommonMessageBar bind:inpVal={searchVal} class='mt-[92vh]'/>
 	</div>
 </div>

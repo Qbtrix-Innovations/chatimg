@@ -1,35 +1,67 @@
 <script>
+	import { FileType } from 'lucide-svelte';
 	import { clsx } from 'clsx';
-    import Button from './ui/button/button.svelte';
-    import Input from './ui/input/input.svelte';
+	import Button from './ui/button/button.svelte';
+	import Input from './ui/input/input.svelte';
 	export { className as class };
-    
+
 	/**
 	 * @type {string}
 	 */
-	 export let inpVal;
+	export let inpVal;
 	let className = '';
 	let recording = false;
-	const plusClicked = ()=>{
+	/**
+	 * @type {() => void}
+	 */
+	export let imgUploadClicked;
+	const plusClicked = () => {
+		imgUploadClicked();
 		console.log('inside function');
 	};
-	const micClicked = ()=>{
-		recording=true;
+	const micClicked = () => {
+		recording = true;
 	};
-	const sentClicked=()=>{
-
-	}
+	
+	/**
+	 * @type {() => any}
+	 */
+	 export let sentMessageClicked;
+	const sentClicked = async () => {
+		await sentMessageClicked();
+	};
+	export let file;
 </script>
 
-<div class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}>
-	<Button
+<div
+	class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}
+>
+	<div
+		class={clsx(
+			'h-10 w-10 flex bg-[#4caf50] m-2 pb-2 px-2 rounded-full align-middle text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] '
+		)}
+	>
+		<label>
+			+
+			<input
+				type="file"
+				accept="image/*;pdf/*"
+				name="file"
+				on:change={(/**@type {any}*/ e) => {
+					file = e.target.files[0];
+				}}
+				class="hidden"
+			/>
+		</label>
+	</div>
+	<!-- <Button
 		size="icon"
 		on:click={plusClicked}
 		class={clsx(
 			'flex bg-[#4caf50] m-2 pb-2 px-4 rounded-full text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] '
 		)}
 		>+
-	</Button>
+	</Button> -->
 	<Input
 		class={clsx(
 			'sm:pl-10 sm:pr-12 px-10 w-[90%] rounded-[21px] h-[42px] bg-white shadow-[0px_3px_3.2px_0px_#D2D2D224] text-[#607D8B] leading-4 items-center text-[14px]'
@@ -37,7 +69,7 @@
 		placeholder="Type here ..."
 		bind:value={inpVal}
 	/>
-	<Button class="bg-transparent absolute sm:mr-[75%] mr-[55%]" on:click={micClicked} >
+	<!-- <Button class="bg-transparent absolute sm:mr-[75%] mr-[55%]" on:click={micClicked}>
 		<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
 				d="M8.14286 1.35715C7.60296 1.35715 7.08516 1.57162 6.70339 1.95339C6.32162 2.33516 6.10715 2.85296 6.10715 3.39286V8.14286C6.10715 8.68277 6.32162 9.20056 6.70339 9.58233C7.08516 9.9641 7.60296 10.1786 8.14286 10.1786C8.68277 10.1786 9.20056 9.9641 9.58233 9.58233C9.9641 9.20056 10.1786 8.68277 10.1786 8.14286V3.39286C10.1786 2.85296 9.9641 2.33516 9.58233 1.95339C9.20056 1.57162 8.68277 1.35715 8.14286 1.35715Z"
@@ -61,7 +93,7 @@
 				stroke-linejoin="round"
 			/>
 		</svg>
-	</Button>
+	</Button> -->
 	<Button class="bg-transparent absolute sm:ml-[85%] ml-[85%]" on:click={sentClicked}>
 		<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path

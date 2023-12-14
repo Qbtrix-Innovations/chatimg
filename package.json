@@ -32,7 +32,8 @@
 	"dependencies": {
 		"bits-ui": "^0.9.8",
 		"clsx": "^2.0.0",
-		"firebase": "^10.6.0",
+		"compressorjs": "^1.2.1",
+		"firebase": "^10.7.1",
 		"formsnap": "^0.4.1",
 		"lucide-svelte": "^0.292.0",
 		"svelte-french-toast": "^1.2.0",

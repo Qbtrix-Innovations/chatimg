@@ -29,20 +29,20 @@ import { authStore } from "../userauth/authStore";
 
 // Function to check the user's application status
 async function checkStatus() {
-  console.log('Cheking status...')
+  // console.log('Cheking status...')
   // await getUser(get(userData).id)
   const currentUser = get(authStore); // Get the current value of the user store
   if (currentUser.currentUser!==null) {
     const userDoc = await getDoc(doc(db, 'users', currentUser.currentUser.uid));
     // @ts-ignore
     userData.set(userDoc.data());
-    console.log(userData);
+    // console.log(userData);
   }
   
   const userDataInstance = get(userData);
   if (currentUser.currentUser?.uid !== undefined) {
-    console.log('uid', currentUser.currentUser.uid)
-    console.log(userDataInstance);
+    // console.log('uid', currentUser.currentUser.uid)
+    // console.log(userDataInstance);
     const chatsRef = collection(db, "chats");
     const actualQuery = query(chatsRef, where('participants', 'array-contains', currentUser.currentUser.uid));
     /**
@@ -50,6 +50,9 @@ async function checkStatus() {
      */
     // ,orderBy('lastMessage', 'desc')
     const querySnapshot = await getDocs(actualQuery);
+    /**
+     * @type {import("@firebase/firestore").DocumentData[]}
+     */
     const chats = [];
     querySnapshot.forEach((doc) => {
       // Get each chat document's data
@@ -59,6 +62,9 @@ async function checkStatus() {
       // Add the data to the chats array
       chats.push(data);
     });
+    chats.forEach((chat)=>{
+      console.log(chat);
+    })
 /**
  * To do set chats store asap.
  */
@@ -67,6 +73,7 @@ async function checkStatus() {
     // otherwise the user will go to new chat page.
     if (chats.length > 0) {
       goto('/home');
+      // goto('/userProfile');
     } else {
       goto('/newChat');
     }

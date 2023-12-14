@@ -1,7 +1,7 @@
 import { authStore } from "$lib/stores/userauth/authStore.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "$lib/services/firebase/firebase";
-import { goto } from "$app/navigation";
+// import { goto } from "$app/navigation";
 import { get } from "svelte/store"
 import { userData } from "$lib/stores/user/userStore";
 import checkStatus from "$lib/stores/user/initialNavigation";
@@ -14,7 +14,7 @@ export async function load({ }) {
                 authStore.update((currState)=>{
                     return {...currState,isLoading:false,currentUser:authUser}
                 });
-                console.log('from layout', get(authStore))
+                // console.log('from layout', get(authStore))
                 checkStatus()
             } else {
                 authStore.update((currState)=>{
