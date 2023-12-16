@@ -43,6 +43,19 @@
 			// console.log(apiKey);
 			const lol = localStorage.getItem($userData.id + '_OPEN_AI_API_KEY');
 			// console.log(lol);
+			let finalDay = new Date();
+			finalDay.setMonth(finalDay.getMonth() + 6);
+			const startDate = new Date();
+			await updateDoc(doc(db, `users`, $userData.id), {
+				subscriptionDetails: {
+					startDate: startDate,
+					endDate: finalDay,
+					planType: 'ownAPI'
+				}
+			});
+			$userData.subscriptionDetails.startDate = startDate;
+			$userData.subscriptionDetails.endDate = finalDay;
+			$userData.subscriptionDetails.planType = 'ownAPI';
 		}
 	};
 
@@ -117,23 +130,22 @@
 									console.log(error);
 								},
 								() => {
-									getDownloadURL(uploadTask.snapshot.ref)
-										.then((downloadURL) => {
-											photoUrl = downloadURL;
-                                            
-                                            // Update firestore Database
-											// @ts-ignore
-											updateDocumentById('users', udis, {
-												profilePictureUrl: downloadURL
-											});
-										})
-										// .then(() => {
-											// Update firestore Database
-											// @ts-ignore
-											// updateDocumentById('users', udis, {
-											// 	profilePictureUrl: photoUrl
-											// });
-										// });
+									getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+										photoUrl = downloadURL;
+
+										// Update firestore Database
+										// @ts-ignore
+										updateDocumentById('users', udis, {
+											profilePictureUrl: downloadURL
+										});
+									});
+									// .then(() => {
+									// Update firestore Database
+									// @ts-ignore
+									// updateDocumentById('users', udis, {
+									// 	profilePictureUrl: photoUrl
+									// });
+									// });
 								}
 							);
 						},
@@ -255,7 +267,12 @@
 		<div class="font-semibold leading-4 text-sm text-[rgba(38,50,56,1)] opacity-50">
 			Subscription
 		</div>
-		<button class="font-semibold leading-4 text-sm text-[rgba(76,175,80,1)] opacity-80" on:click={()=>{goto('/pricingCard')}}>Upgrade</button>
+		<button
+			class="font-semibold leading-4 text-sm text-[rgba(76,175,80,1)] opacity-80"
+			on:click={() => {
+				goto('/pricingCard');
+			}}>Upgrade</button
+		>
 	</div>
 	<!-- Subscriptions list -->
 	<div

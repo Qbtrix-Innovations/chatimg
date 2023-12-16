@@ -44,7 +44,7 @@ async function checkStatus() {
     // console.log('uid', currentUser.currentUser.uid)
     // console.log(userDataInstance);
     const chatsRef = collection(db, "chats");
-    const actualQuery = query(chatsRef, where('participants', 'array-contains', currentUser.currentUser.uid));
+    const actualQuery = query(chatsRef, where('participants', 'array-contains', currentUser.currentUser.uid),orderBy('lastMessage'));
     /**
      * to implement orderBy for timestamp we have to set firebase indexes further discussion required in this aspect.
      */

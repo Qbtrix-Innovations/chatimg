@@ -9,6 +9,7 @@
 	import { userData } from '$lib/stores/user/userStore';
 	import { FileType } from 'lucide-svelte';
 	import Compressor from 'compressorjs';
+	import OpenAI from 'openai';
 
 	/**
 	 * @type {string | null | undefined}
@@ -169,6 +170,42 @@
 					sentBy: uid,
 					sentAt: serverTimestamp(),
 					text: searchVal,
+					isEdited: false,
+					isDeleted: false
+				});
+				const openai = new OpenAI({
+					apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+					dangerouslyAllowBrowser: true
+				});
+				const response = await openai.chat.completions.create({
+					model: 'gpt-4-vision-preview',
+					max_tokens: 300,
+					messages: [
+						{
+							role: 'user',
+							// content: cont
+							// @ts-ignore
+							content: [
+								{
+									type: 'text',
+									text: `${searchVal}`
+								}
+								// {
+								// 	type: 'image_url',
+								// 	image_url: {
+								// 		url: `${data.imagesDataArray[0].imageUrl}`,
+								// 		detail:'low'
+								// 	}
+								// },
+							]
+						}
+					]
+				});
+				console.log(response);
+				const messagesRefOpenAI = await addDoc(collection(db, `chats/${chatsRef.id}/messages`), {
+					sentBy: 'GPT',
+					sentAt: serverTimestamp(),
+					text: response.choices[0].message.content,
 					isEdited: false,
 					isDeleted: false
 				});

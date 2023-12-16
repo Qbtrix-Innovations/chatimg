@@ -28,7 +28,7 @@
     <div class="flex flex-row items-center w-full ml-[16px]">
         <img src={url} alt="" class="hover:opacity-100 rounded-[5px] bg-[rgba(217,217,217,1)] h-9 w-12"/>
         <div class="flex flex-col pl-2">
-            <div class='font-normal text-[14px] leading-6 text-[rgba(38,50,56,1)] text-left ' >{lastMessage.length>0?lastMessage:'Write a message to start conversation !'}</div>
+            <div class='font-normal text-[14px] leading-6 text-[rgba(38,50,56,1)] text-left ' >{lastMessage.length>0?lastMessage.substring(0,30)+'...':'Write a message to start conversation !'}</div>
             <div class='text-[rgba(110,110,110,1)] leading-3 text-[10px] font-medium h-3 text-left' >{new Date(time.seconds*1000).toString().slice(0,25)}</div>
         </div>
     </div>

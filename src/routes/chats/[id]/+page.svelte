@@ -9,19 +9,26 @@
 	import { goto, afterNavigate } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
 	import { chatsData } from '$lib/stores/chats/chatStore';
-	import { addDoc, collection, doc, getDocs, serverTimestamp, updateDoc } from 'firebase/firestore';
+	import {
+		addDoc,
+		collection,
+		doc,
+		getDocs,
+		orderBy,
+		query,
+		serverTimestamp,
+		updateDoc
+	} from 'firebase/firestore';
 	import { app, db } from '$lib/services/firebase/firebase';
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import Compressor from 'compressorjs';
 	import { Title } from '$lib/components/ui/alert';
 	import { text } from '@sveltejs/kit';
+	import OpenAI from 'openai';
 
-	// import { onMount } from 'svelte';
-	// import { chatsData } from '$lib/stores/chats/chatStore';
-	// import { files } from '$service-worker';
-	const root = 'http://localhost:5173/'
+	const root = 'http://localhost:5173/';
 	let completeUploadFunction;
-	let uploading=false;
+	let uploading = false;
 	let email = $userData.email;
 	let compressedFile;
 	/**
@@ -60,7 +67,9 @@
 							compressedFileType = file.type;
 							uploadTask.on(
 								'state_changed',
-								(/** @type {{ bytesTransferred: number; totalBytes: number; state: any; }} */ snapshot) => {
+								(
+									/** @type {{ bytesTransferred: number; totalBytes: number; state: any; }} */ snapshot
+								) => {
 									const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 									console.log('Upload is ' + progress + '% done');
 									switch (snapshot.state) {
@@ -128,17 +137,19 @@
 			});
 
 			// console.log(ImagesRef);
-			data.imagesDataArray = [...data.imagesDataArray,{
-				uploadedBy: $userData.id,
-				uploadedAt: serverTimestamp(),
-				imageUrl: photoUrl,
-				thumbnailUrl: photoUrl,
-				fileSize: compressedFileSize,
-				fileType: compressedFileType
-				// metaData:,
-			}];
+			data.imagesDataArray = [
+				...data.imagesDataArray,
+				{
+					uploadedBy: $userData.id,
+					uploadedAt: serverTimestamp(),
+					imageUrl: photoUrl,
+					thumbnailUrl: photoUrl,
+					fileSize: compressedFileSize,
+					fileType: compressedFileType
+					// metaData:,
+				}
+			];
 			// goto(`/chats/${data.uid}`);
-
 		} catch (err) {
 			console.log(err);
 			console.log('There was an error saving your information');
@@ -155,38 +166,37 @@
 	function back() {
 		// console.log(previousPage);
 		// goto(previousPage);
-		if ($userData.id.length>0) {
+		if ($userData.id.length > 0) {
 			goto('/home');
-		}
-		else{
-			goto('/auth')
+		} else {
+			goto('/auth');
 		}
 	}
 	function goToNewChat() {
 		goto('/newChat');
 	}
-	const share = async ()=>{
+	const share = async () => {
 		let titleText;
 		let urlText;
 		let textText;
 		let shareData;
-		if (data.imagesDataArray.length>0) {
-			titleText = data.imagesDataArray[0].imageUrl.split('.com_')[1].split('?alt')[0].slice(14,);
+		if (data.imagesDataArray.length > 0) {
+			titleText = data.imagesDataArray[0].imageUrl.split('.com_')[1].split('?alt')[0].slice(14);
 			textText = '';
 			for (let index = 0; index < data.MessagesDataArray.length; index++) {
 				const element = data.MessagesDataArray[index];
-				textText=textText+'_;_'+element.text;
+				textText = textText + '_;_' + element.text;
 			}
 			console.log(textText);
-			textText+=data.imagesDataArray[0].imageUrl;
+			textText += data.imagesDataArray[0].imageUrl;
 			// urlText =  data.imagesDataArray[0].imageUrl;
-			urlText = root+'chats/shared/'+data.uid;
+			urlText = root + 'chats/shared/' + data.uid;
 			console.log(urlText);
 			shareData = {
 				title: `Chat shared by ${$userData.userName}`,
-				text:'Use ChatImg to talk with Images and watch them come alive.',
-				url:urlText
-			}
+				text: 'Use ChatImg to talk with Images and watch them come alive.',
+				url: urlText
+			};
 			console.log(shareData);
 			// const shareDataJSON = JSON.stringify(shareData);
 			// const base64ShareData = btoa(shareDataJSON);
@@ -194,20 +204,20 @@
 		}
 		// Check if the Web Share API is supported
 		if (navigator.share) {
-		  // Try to share the data
-		  try {
-		    await navigator.share(shareData);
-		    console.log("Data shared successfully");
-		  } catch (err) {
-		    // Handle any errors
-		    console.error("Error while sharing:", err);
-		  }
+			// Try to share the data
+			try {
+				await navigator.share(shareData);
+				console.log('Data shared successfully');
+			} catch (err) {
+				// Handle any errors
+				console.error('Error while sharing:', err);
+			}
 		} else {
-		  // Fallback to some other sharing method
-		  console.log("Web Share API not supported");
+			// Fallback to some other sharing method
+			console.log('Web Share API not supported');
 		}
 		// return;
-	}
+	};
 	let loading = false;
 
 	/**
@@ -215,69 +225,12 @@
 	 */
 	let file;
 	let images;
-	// onMount(()=>{})
 	export let data;
 	let conv = data.MessagesDataArray;
-	// console.log(conv);
-	// conv = [
-	// 	{
-	// 		sender: 'hm',
-	// 		time: '01:30 pm',
-	// 		txt: 'What is this photo about?'
-	// 	},
-	// 	{
-	// 		sender: 'ai',
-	// 		time: '01:30 pm',
-	// 		txt: 'It is a long established fact that a reader will be distracted by the readable content of a page when'
-	// 	},
-	// 	{
-	// 		sender: 'hm',
-	// 		time: '01:30 pm',
-	// 		txt: 'What is this photo about?'
-	// 	},
-	// 	{
-	// 		sender: 'ai',
-	// 		time: '01:30 pm',
-	// 		txt: 'It is a long established fact that a reader will be distracted by the readable content of a page when'
-	// 	},
-	// 	{
-	// 		sender: 'hm',
-	// 		time: '01:30 pm',
-	// 		txt: 'What is this photo about?'
-	// 	},
-
-	// 	{
-	// 		sender: 'ai',
-	// 		time: '01:30 pm',
-	// 		txt: 'It is a long established fact that a reader will be distracted by the readable content of a page when'
-	// 	},
-	// 	{
-	// 		sender: 'hm',
-	// 		time: '01:30 pm',
-	// 		txt: 'What is this photo about?'
-	// 	},
-	// 	{
-	// 		sender: 'ai',
-	// 		time: '01:30 pm',
-	// 		txt: 'It is a long established fact that a reader will be distracted by the readable content of a page when'
-	// 	}
-	// ];
 	/**
 	 * @type {string}
 	 */
 	let searchVal;
-	// if (data.imagesDataArray[0].imageURL === undefined) {
-	// 	data.imagesDataArray[0].imageURL = ['noImage.jpg'];
-	// }
-	console.log(data);
-	// console.log(data.imagesDataArray[0].imageUrl);
-	// let cd = $chatsData;
-	// let chatData;
-	// for (let index = 0; index < cd.length; index++) {
-	// 	if (cd[index].id == ) {
-	// 		chatData=cd[index];
-	// 	}
-	// }
 	const sendMessage = async () => {
 		const messagesRef = await addDoc(collection(db, `chats/${data.uid}/messages`), {
 			sentBy: $userData.id,
@@ -286,27 +239,38 @@
 			isEdited: false,
 			isDeleted: false
 		});
-		const querySnapshotMsg = await getDocs(collection(db, `chats/${data.uid}/messages`));
+		const querySnap = query(collection(db, `chats/${data.uid}/messages`), orderBy('sentAt', 'asc'));
+		const querySnapshotMsg = await getDocs(querySnap);
 		// Extract data from query snapshot
 		const MessagesData = querySnapshotMsg.docs.map((doc) => doc.data());
 		data.MessagesDataArray = MessagesData;
-		await updateDoc(doc(db,`chats`,data.uid),{
-			lastMessagePreview:searchVal,
-			lastMessage:serverTimestamp()
+		await updateDoc(doc(db, `chats`, data.uid), {
+			lastMessagePreview: searchVal,
+			lastMessage: serverTimestamp()
 		});
-		// data.MessagesDataArray=[...data.MessagesDataArray,{
-		// 		sentBy: $userData.id ,
-		// 		sentAt: serverTimestamp(),
-		// 		text: searchVal,
-		// 		isEdited: false,
-		// 		isDeleted: false
-		// 	}];
+		let openAiResponse;
+		if (data.imagesDataArray.length > 0) {
+			openAiResponse = await getOpenAiReply(searchVal);
+		} else {
+			openAiResponse = await getOpenAiReplyWithoutImage(searchVal);
+		}
+		const messagesRefOpenAI = await addDoc(collection(db, `chats/${data.uid}/messages`), {
+			sentBy: 'GPT',
+			sentAt: serverTimestamp(),
+			text: openAiResponse.choices[0].message.content,
+			isEdited: false,
+			isDeleted: false
+		});
+		const querySnapshotMsgOpenAi = await getDocs(querySnap);
+		// Extract data from query snapshot
+		const MessagesDataOpenAi = querySnapshotMsgOpenAi.docs.map((doc) => doc.data());
+		data.MessagesDataArray = MessagesDataOpenAi;
 		searchVal = '';
 	};
 	let copySuccess = false;
-		
+
 	const copyToClipboard = (/** @type {string} */ inpVal) => {
-		let textToCopy = document.getElementById(inpVal)?.innerHTML ;
+		let textToCopy = document.getElementById(inpVal)?.innerHTML;
 		const textarea = document.createElement('textarea');
 		// @ts-ignore
 		textarea.value = textToCopy;
@@ -320,6 +284,81 @@
 		}
 		document.body.removeChild(textarea);
 	};
+
+	/**
+	 * @param {string} inpTxt
+	 */
+	async function getOpenAiReply(inpTxt) {
+		const openai = new OpenAI({
+			apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+			dangerouslyAllowBrowser: true
+		});
+		console.log(data.imagesDataArray[0].imageUrl);
+
+		const imageUrl = data.imagesDataArray[0].imageUrl;
+		console.log('Image URL:', imageUrl);
+		const response = await openai.chat.completions.create({
+			model: 'gpt-4-vision-preview',
+			max_tokens: 300,
+			messages: [
+				{
+					role: 'user',
+					// content: cont
+					// @ts-ignore
+					content: [
+						{
+							type: 'text',
+							text: `${inpTxt}`
+						},
+						{
+							type: 'image_url',
+							image_url: {
+								url: `${imageUrl}`,
+								detail: 'low'
+							}
+						}
+					]
+				}
+			]
+		});
+		console.log(response);
+		return response;
+	}
+	/**
+	 * @param {string} inpTxt
+	 */
+	async function getOpenAiReplyWithoutImage(inpTxt) {
+		const openai = new OpenAI({
+			apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+			dangerouslyAllowBrowser: true
+		});
+		const response = await openai.chat.completions.create({
+			model: 'gpt-4-vision-preview',
+			max_tokens: 300,
+			messages: [
+				{
+					role: 'user',
+					// content: cont
+					// @ts-ignore
+					content: [
+						{
+							type: 'text',
+							text: `${inpTxt}`
+						}
+						// {
+						// 	type: 'image_url',
+						// 	image_url: {
+						// 		url: `${data.imagesDataArray[0].imageUrl}`,
+						// 		detail:'low'
+						// 	}
+						// },
+					]
+				}
+			]
+		});
+		console.log(response);
+		return response;
+	}
 </script>
 
 <div class={clsx('bg-[#f5f5f5] h-[100vh]')}>

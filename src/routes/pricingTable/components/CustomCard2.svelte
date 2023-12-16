@@ -1,6 +1,10 @@
 <script>
+	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { db } from '$lib/services/firebase/firebase';
+	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
+	import { doc, updateDoc } from 'firebase/firestore';
 	/**
 	 * @type {string}
 	 */
@@ -18,12 +22,12 @@
 	 */
 	export let icn;
 	/**
-	 * @type {'20credits'|'60credits'|'120credits'}
+	 * @type {"20credits/day"|"60credits/day"|"120credits/day"}
 	 */
-	let plan = '20credits';
+	let plan = '20credits/day';
 	let bullet1='20 Credits - 1 credit = 1 chat.';
 	$:{bullet1 = `${
-		plan === '20credits' ? '20' : plan === '60credits' ? '60' : '120'
+		plan === '20credits/day' ? '20' : plan === '60credits/day' ? '60' : '120'
 	} Credits - 1 credit = 1 chat.`;}
 	/**
 	 * @type string[]
@@ -31,6 +35,70 @@
 	let bullets = [bullet1, 'Access to All our rooms'];
 	$:{
 		bullets=[bullet1, 'Access to All our rooms'];
+	}
+	const buyDailyPlan = async ()=>{
+		if (plan==='20credits/day') {
+		const paymentSuccessfull = true;
+			if(paymentSuccessfull){
+			let finalDay = new Date();
+            finalDay.setDate(finalDay.getDate() + 1);   
+            const startDate = new Date();
+            await updateDoc(doc(db, `users`,$userData.id), {
+                subscriptionDetails:{
+                    startDate: startDate,
+                    endDate:finalDay,
+                    planType:"20credits/day"
+                }
+            });
+            $userData.subscriptionDetails.startDate=startDate;
+            $userData.subscriptionDetails.endDate=finalDay;
+            $userData.subscriptionDetails.planType="20credits/day";
+			}
+			else{
+				console.log('unsucceccfull payment');
+			}
+		} else if (plan==='60credits/day') {
+		const paymentSuccessfull = true;
+			if(paymentSuccessfull){
+			let finalDay = new Date();
+            finalDay.setDate(finalDay.getDate() + 1);   
+            const startDate = new Date();
+            await updateDoc(doc(db, `users`,$userData.id), {
+                subscriptionDetails:{
+                    startDate: startDate,
+                    endDate:finalDay,
+                    planType:"60credits/day"
+                }
+            });
+            $userData.subscriptionDetails.startDate=startDate;
+            $userData.subscriptionDetails.endDate=finalDay;
+            $userData.subscriptionDetails.planType="60credits/day";
+			}
+			else{
+				console.log('unsucceccfull payment');
+			}
+		}else if (plan==='120credits/day') {
+		const paymentSuccessfull = true;
+			if(paymentSuccessfull){
+			let finalDay = new Date();
+            finalDay.setDate(finalDay.getDate() + 1);   
+            const startDate = new Date();
+            await updateDoc(doc(db, `users`,$userData.id), {
+                subscriptionDetails:{
+                    startDate: startDate,
+                    endDate:finalDay,
+                    planType:"120credits/day"
+                }
+            });
+            $userData.subscriptionDetails.startDate=startDate;
+            $userData.subscriptionDetails.endDate=finalDay;
+            $userData.subscriptionDetails.planType="120credits/day";
+			}
+			else{
+				console.log('unsucceccfull payment');
+			}
+		}
+		goto('/userProfile');
 	}
 </script>
 
@@ -78,10 +146,10 @@
 	<div class={clsx('flex flex-row justify-between mx-2')}>
 		<div
 			class={clsx(
-				`${plan === '20credits' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
+				`${plan === '20credits/day' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
 			)}
 			on:click={() => {
-				plan = '20credits';
+				plan = '20credits/day';
 			}}
 		>
 			<div>
@@ -92,10 +160,10 @@
 		</div>
 		<div
 			class={clsx(
-				`${plan === '60credits' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
+				`${plan === '60credits/day' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
 			)}
 			on:click={() => {
-				plan = '60credits';
+				plan = '60credits/day';
 			}}
 		>
 			<div>
@@ -106,10 +174,10 @@
 		</div>
 		<div
 			class={clsx(
-				`${plan === '120credits' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
+				`${plan === '120credits/day' ? 'opacity-100' : 'opacity-40'} flex flex-col text-center`
 			)}
 			on:click={() => {
-				plan = '120credits';
+				plan = '120credits/day';
 			}}
 		>
 			<div>
@@ -120,6 +188,7 @@
 		</div>
 	</div>
 	<Button
+		on:click={buyDailyPlan}
 		class={clsx(
 			'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
 		)}

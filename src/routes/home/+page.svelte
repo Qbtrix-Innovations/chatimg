@@ -1,6 +1,6 @@
 <script>
 	import { db } from '$lib/services/firebase/firebase.js';
-	import { collection, getDocs, query, where } from 'firebase/firestore';
+	import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 
 	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
 	import ImgChatHistory from './components/ImgChatHistory.svelte';
@@ -44,7 +44,7 @@
 			// console.log(data.user?.id);
 			const id = $userData.id;
 			console.log(id);
-			const q = query(chatsCollection, where('participants', 'array-contains', id));
+			const q = query(chatsCollection, where('participants', 'array-contains', id),orderBy('lastMessage','asc'));
 			const querySnapshot = await getDocs(q);
 			// Iterate through the chat documents
 			console.log('outside');
@@ -59,23 +59,6 @@
 				// Update the chatData array
 				chatData.push(chatInfo);
 			});
-			// console.log(chatData);
-			// chatData.reduce((promiseChain, chat) => {
-			//     console.log('inside reduce');
-			// 	return promiseChain.then(
-			// 		() =>
-			// 			new Promise((resolve) => {
-			// 				return async () => {
-			//                     console.log('internal');
-			// const imagesCollectionRef = collection(chatsCollection, chat.id, 'images');
-			// const imagesQuerySnapshot = await getDocs(imagesCollectionRef);
-			// const imagesData = imagesQuerySnapshot.docs.map((imageDoc) => imageDoc.data());
-			// chat.images = imagesData;
-			//                     console.log(imagesData);
-			// 				};
-			// 			})
-			// 	);
-			// }, Promise.resolve());
 			/**
 			 * @param {string | any[]} array
 			 * @param {(arg0: any, arg1: number, arg2: any) => any} callback
@@ -87,37 +70,19 @@
 			}
 			await asyncForEach(chatData, async (chat) => {
 				const imagesCollectionRef = collection(chatsCollection, chat.id, 'images');
-				const imagesQuerySnapshot = await getDocs(imagesCollectionRef);
+				const q2 = query(imagesCollectionRef,orderBy('uploadedAt','asc'))
+				const imagesQuerySnapshot = await getDocs(q2);
 				const imagesData = imagesQuerySnapshot.docs.map((imageDoc) => imageDoc.data());
 				chat.images = imagesData;
 			});
 			console.log(chatData);
 			// @ts-ignore
 			chatsData.set(chatData);
-			/**
-             *  .reduce((promiseChain, item) => {
-                        return promiseChain.then(() => new Promise((resolve) => {
-                            asyncFunction(item, resolve);
-                        }));
-                    }, Promise.resolve()
-                );
-            */
-			// Reference to the 'images' subcollection for the current chat document
-			// chatData.forEach(async(chat)=>{
-			//     console.log('inside');
-			// 	const imagesCollectionRef = collection(chatsCollection, chat.id, 'images');
-			// 	// Fetch documents from the 'images' subcollection
-			// 	const imagesQuerySnapshot = await getDocs(imagesCollectionRef);
-			// 	const imagesData = imagesQuerySnapshot.docs.map((imageDoc) => imageDoc.data());
-			//     chat.images=imagesData;
-			// })
+			
 		} catch (err) {
 			console.log(err);
 		}
 	};
-	// onMount(async () => {
-	// 	await getChats();
-	// });
 	$: {
 		if ($userData?.id) {
 			console.log($userData.id);
