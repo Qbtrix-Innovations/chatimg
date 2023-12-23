@@ -1,11 +1,13 @@
+import type firebase from "firebase/compat/app";
+export type FirestoreTimestamp = firebase.firestore.Timestamp;
 export class Image {
 	uploadedBy: string;
-	uploadedAt: Date;
+	uploadedAt: FirestoreTimestamp;
 	imageUrl: string;
 	thumbnailUrl: string;
 	fileSize: number;
 	fileType: string;
-	metadata: {
+	metadata?: {
 		tags: string[];
 		description?: string;
 		geolocation: {
@@ -26,7 +28,7 @@ export class Image {
 		longitude
 	}: {
 		uploadedBy: string;
-		uploadedAt: Date;
+		uploadedAt: FirestoreTimestamp;
 		imageUrl: string;
 		thumbnailUrl: string;
 		fileSize: number;
@@ -37,7 +39,7 @@ export class Image {
 		longitude: string;
 	}) {
 		this.uploadedBy = uploadedBy;
-		this.uploadedAt = new Date(uploadedAt);
+		this.uploadedAt = uploadedAt;
 		this.imageUrl = imageUrl;
 		this.thumbnailUrl = thumbnailUrl;
 		this.fileSize = fileSize;

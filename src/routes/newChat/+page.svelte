@@ -1,4 +1,6 @@
 <script>
+	import { Undo2 } from 'lucide-svelte';
+	import { text } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
 	import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
 	import { clsx } from 'clsx';
@@ -7,10 +9,12 @@
 	import { addDoc, collection, getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 	import { authStore } from '$lib/stores/userauth/authStore';
 	import { userData } from '$lib/stores/user/userStore';
-	import { FileType } from 'lucide-svelte';
 	import Compressor from 'compressorjs';
 	import OpenAI from 'openai';
-
+	import { addNewChatService } from '../../services/chatService';
+	import { addImageToChatService } from '../../services/imageService';
+	import { addMessageToChat } from '../../services/messageServices';
+	
 	/**
 	 * @type {string | null | undefined}
 	 */
@@ -27,8 +31,6 @@
 	 */
 	let uid;
 	$: uid = $authStore?.currentUser?.uid;
-	let userDataInstance = $userData;
-
 	/**
 	 * @type {File}
 	 */
@@ -50,6 +52,10 @@
 	 */
 	let compressedFileSize;
 	/**
+	 * @type {import("../../lib/core/entities/Image").Image}
+	 */
+	let img;
+	/**
 	 * @type {string}
 	 */
 	let searchVal;
@@ -58,9 +64,9 @@
 	 */
 	let completeUploadFunction;
 	$: {
-		completeUploadFunction = () => {
+		completeUploadFunction = async () => {
 			uploading = true;
-			// console.log('changed');
+			console.log('changed');
 			const storage = getStorage(app);
 			const upload = () => {
 				const name = email + '_' + new Date().getTime() + '_' + file.name;
@@ -71,8 +77,8 @@
 				function compressAndUploadImage(file) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
-						maxWidth: 1920, // the max width of the output image
-						maxHeight: 1080, // the max height of the output image
+						maxWidth: 1024, // the max width of the output image
+						maxHeight: 1024, // the max height of the output image
 						success(result) {
 							// Create a file reference
 							compressedFile = result;
@@ -114,39 +120,75 @@
 				}
 				compressAndUploadImage(file);
 			};
+			// photoUrl = await uploadImages(email,file,uid);
 			file && upload();
+			// if (file) {
+			// 	// @ts-ignore
+			// 	uploadImages(email,file,uid).then((img2)=>{
+			// 		img=img2;
+			// 	}).then(()=>{
+			// 		createNewChat();
+			// 	})
+			// }
 			uploading = false;
 		};
 		file && completeUploadFunction();
 	}
+
 	async function createNewChat() {
 		try {
-			const part = [];
-			part.push(uid);
-			// const userRef = doc(db, 'users/chats', email + '_' + new Date().getTime() + '_' + file.name);
-			const chatsRef = await addDoc(collection(db, `chats`), {
-				participants: part,
-				createdAt: serverTimestamp(),
-				lastMessage: serverTimestamp(),
-				lastMessagePreview: '',
-				isArchived: false
-			});
-			// const messagesRef = await addDoc(collection(db,`chats/${chatsRef.id}/messages`),{
-			// 	sentBy:uid,
-			// 	sentAt:serverTimestamp(),
-			// 	text:"",
-			// 	isEdited:false,
-			// 	isDeleted:false,
-			// });
-			const ImagesRef = await addDoc(collection(db, `chats/${chatsRef.id}/images`), {
+			const part = [uid];
+			// @ts-ignore
+			const chatsRef = await addNewChatService(part);
+			const img = {
 				uploadedBy: uid,
-				uploadedAt: serverTimestamp(),
+				uploadedAt: new Date(),
 				imageUrl: photoUrl,
 				thumbnailUrl: photoUrl,
 				fileSize: compressedFileSize,
 				fileType: compressedFileType
-				// metaData:,
+			};
+			// @ts-ignore
+			const ImagesRef = await addImageToChatService(img, chatsRef.id);
+			const openai = new OpenAI({
+				apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+				dangerouslyAllowBrowser: true
 			});
+			console.log(ImagesRef[0].imageUrl);
+			const response = await openai.chat.completions.create({
+				model: 'gpt-4-vision-preview',
+				max_tokens: 1024,
+				messages: [
+					{
+						role: 'user',
+						content: [
+							{
+								type: 'text',
+								text: 'Give a detailed description of the given image. This description will be further passed on to another Large Language Model where it will be used for answering various questions that are asked by the user. Only reply with the descriptino for the image and nothing more as the description will also be shown to the user.'
+							},
+							{
+								type: 'image_url',
+								image_url: {
+									url: `${ImagesRef[0].imageUrl}`,
+									detail: 'high'
+								}
+							}
+						]
+					}
+				]
+			});
+			const messagesRefOpenAI = await addMessageToChat(
+				{
+					sentBy: 'GPT',
+					// @ts-ignore
+					sentAt: {},
+					// @ts-ignore
+					text: `${response.choices[0].message.content}`,
+					isEdited: false,
+					isDeleted: false
+				},
+				chatsRef.id
+			);
 			goto(`/chats/${chatsRef.id}`);
 		} catch (err) {
 			console.log(err);
@@ -158,21 +200,20 @@
 			try {
 				const part = [];
 				part.push(uid);
-				// const userRef = doc(db, 'users/chats', email + '_' + new Date().getTime() + '_' + file.name);
-				const chatsRef = await addDoc(collection(db, `chats`), {
-					participants: part,
-					createdAt: serverTimestamp(),
-					lastMessage: serverTimestamp(),
-					lastMessagePreview: searchVal.substring(0, 50),
-					isArchived: false
-				});
-				const messagesRef = await addDoc(collection(db, `chats/${chatsRef.id}/messages`), {
-					sentBy: uid,
-					sentAt: serverTimestamp(),
-					text: searchVal,
-					isEdited: false,
-					isDeleted: false
-				});
+				// @ts-ignore
+				const chatsRef = await addNewChatService(part);
+				const messageRef = await addMessageToChat(
+					{
+						// @ts-ignore
+						sentBy: uid,
+						// @ts-ignore
+						sentAt: {},
+						text: searchVal,
+						isEdited: false,
+						isDeleted: false
+					},
+					chatsRef.id
+				);
 				const openai = new OpenAI({
 					apiKey: import.meta.env.VITE_OPENAI_API_KEY,
 					dangerouslyAllowBrowser: true
@@ -183,32 +224,27 @@
 					messages: [
 						{
 							role: 'user',
-							// content: cont
-							// @ts-ignore
 							content: [
 								{
 									type: 'text',
 									text: `${searchVal}`
 								}
-								// {
-								// 	type: 'image_url',
-								// 	image_url: {
-								// 		url: `${data.imagesDataArray[0].imageUrl}`,
-								// 		detail:'low'
-								// 	}
-								// },
 							]
 						}
 					]
 				});
-				console.log(response);
-				const messagesRefOpenAI = await addDoc(collection(db, `chats/${chatsRef.id}/messages`), {
-					sentBy: 'GPT',
-					sentAt: serverTimestamp(),
-					text: response.choices[0].message.content,
-					isEdited: false,
-					isDeleted: false
-				});
+				const messagesRefOpenAI = await addMessageToChat(
+					{
+						sentBy: 'GPT',
+						// @ts-ignore
+						sentAt: {},
+						// @ts-ignore
+						text: response.choices[0].message.content,
+						isEdited: false,
+						isDeleted: false
+					},
+					chatsRef.id
+				);
 				goto(`/chats/${chatsRef.id}`);
 			} catch (err) {
 				console.log(err);
@@ -219,15 +255,20 @@
 </script>
 
 <div class="bg-[#f5f5f5] h-screen flex flex-col">
-	<div class="font-semibold text-[14px] text-[#263238] mt-2 ml-4">
-		Chat Img
-		{#if userName}
-			<span
-				class="text-transparent bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]"
-			>
-				Hi {userName?.split(' ')[0]} !</span
-			>
-		{/if}
+	<div class="font-semibold text-[14px] text-[#263238] mt-2 ml-4 flex flex-row justify-between">
+		<div>
+			Chat Img
+			{#if userName}
+				<span
+					class="text-transparent ml-[2px] bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]"
+				>
+					Hi {userName?.split(' ')[0]} !</span
+				>
+			{/if}
+		</div>
+		<button on:click={()=>{goto('/home')}}>
+			<Undo2/>
+		</button>
 	</div>
 	<div class="mt-[70%] h-1/2 flex flex-col">
 		<div class="flex items-center justify-center active:scale-[85%] transition-transform">

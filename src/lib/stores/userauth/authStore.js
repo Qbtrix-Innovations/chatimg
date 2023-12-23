@@ -4,6 +4,7 @@ import { collection, doc, setDoc, getDoc, addDoc, Timestamp, serverTimestamp } f
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updatePassword, updateProfile } from 'firebase/auth';
 import { userData } from '../user/userStore';
 import { goto } from '$app/navigation';
+import Stripe from 'stripe';
 /**
  * Svelte store to hold the Authentication Information.
  */
@@ -36,17 +37,33 @@ export const authHandlers = {
             let userCredentials = await createUserWithEmailAndPassword(auth, email, password);
             let finalDay = new Date();
             finalDay.setMonth(finalDay.getMonth() + 6);
+
+            const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY);
+            let customer;
+            if (userInfoData.phoneNumber) {
+                customer = await stripe.customers.create({
+                name: userInfoData.username,
+                email: userInfoData.email,
+                phone:userInfoData.phoneNumber,
+              });                
+            }else{
+                customer = await stripe.customers.create({
+                    name: userInfoData.username,
+                    email: userInfoData.email,
+                });                
+            }
             // set the user doc
             /**
             * @type {{
             *          id:string,
+            *          stripeCustomerId:string,
             *          userName:string,
             *          email:string,
             *          phoneNumber:string,
             *          dateOfBirth:Date|null|Timestamp|serverTimestamp,
             *          profilePictureUrl:string,
-            *          createdAt:Date|null|Timestamp|serverTimestamp,
-            *          lastLogin:Date|null|Timestamp|serverTimestamp, 
+            *          createdAt:Date|null|serverTimestamp,
+            *          lastLogin:Date|null|serverTimestamp, 
             *          isPremium:boolean,
             *          subscriptionDetails:{
             *                                  startDate:Date|null|Timestamp|serverTimestamp,
@@ -55,23 +72,24 @@ export const authHandlers = {
             *                               }
             *          }}
             */
-            const userDoc = {
+            await setDoc(doc(db, 'users', userCredentials.user.uid), {
                 id: userCredentials.user.uid,
+                stripeCustomerId:customer.id,
                 userName: userInfoData.username,
                 email: userInfoData.email,
                 phoneNumber: userInfoData.phoneNumber !== null ? userInfoData.phoneNumber : '',
                 dateOfBirth: userInfoData.dateOfBirth !== null ? Timestamp.fromDate(userInfoData.dateOfBirth) : null,
                 profilePictureUrl: userInfoData.profilePictureUrl !== null ? userInfoData.profilePictureUrl : '',
-                createdAt: serverTimestamp,
-                lastLogin: serverTimestamp,
+                createdAt: serverTimestamp(),
+                lastLogin: serverTimestamp(),
                 isPremium: false,
                 subscriptionDetails: {
                     startDate: Timestamp.fromDate(new Date()),
                     endDate: Timestamp.fromDate(finalDay),
                     planType: "basic",
                 },
-            };
-            await setDoc(doc(db, 'users', userCredentials.user.uid), userDoc);
+            });
+            const userDoc = (await getDoc(doc(db, 'users', userCredentials.user.uid))).data()
             // get the user doc
             // const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
             // console.log(userDoc);
@@ -112,11 +130,12 @@ export const authHandlers = {
     },
     logout: async () => {
         try {
-            console.log(auth.currentUser);
+            // console.log(auth.currentUser);
             await signOut(auth);
-            console.log(auth.currentUser);
+            // console.log(auth.currentUser);
             userData.set({
                     id: '',
+                    stripeCustomerId:'',
                     userName: '',
                     email: '',
                     phoneNumber: '',
@@ -129,6 +148,9 @@ export const authHandlers = {
                         startDate: null,
                         endDate: null,
                         planType: "basic",
+                        isActive:false,
+                        availableCredits:0,
+                        totalCredits:0,
                     }
                 }
             );
@@ -162,11 +184,11 @@ export const authHandlers = {
             let user;
             let unsubscribe = authStore.subscribe((state) => {
                 user = state.currentUser;
-                console.log(user);
+                // console.log(user);
             });
             // Check if the user is signed in
             if (user) {
-                console.log(newPassword);
+                // console.log(newPassword);
                 await updatePassword(user, newPassword);
 
                 console.log("Password updated successfully!");

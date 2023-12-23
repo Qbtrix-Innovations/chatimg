@@ -10,13 +10,14 @@
 	import { userData } from '$lib/stores/user/userStore';
 	import { chatsData } from '$lib/stores/chats/chatStore';
 	import { goto, afterNavigate } from '$app/navigation';
+	import clsx from 'clsx';
 	/**
 	 * @type {any}
 	 */
 	let previousPage;
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
-		console.log(previousPage);
+		// console.log(previousPage);
 	});
 	function back() {
 		console.log(previousPage);
@@ -43,13 +44,13 @@
 			// Query to find chat documents where participants array contains the user ID
 			// console.log(data.user?.id);
 			const id = $userData.id;
-			console.log(id);
+			// console.log(id);
 			const q = query(chatsCollection, where('participants', 'array-contains', id),orderBy('lastMessage','asc'));
 			const querySnapshot = await getDocs(q);
 			// Iterate through the chat documents
-			console.log('outside');
+			// console.log('outside');
 			querySnapshot.forEach((chatDoc) => {
-				console.log('inside');
+				// console.log('inside');
 				// Extract data from the main chat document
 				const chatInfo = {
 					id: chatDoc.id,
@@ -85,8 +86,9 @@
 	};
 	$: {
 		if ($userData?.id) {
-			console.log($userData.id);
+			// console.log($userData.id);
 			const impFunc = async () => {
+				console.log($userData);
 				await getChats();
 			};
 			impFunc();
@@ -103,11 +105,14 @@
 		headingLeft={`Hi ${$userData.userName}`}
 		buttonTextRight="New"
 		shareAvailable="false"
+		creditsLeft={$userData.subscriptionDetails.availableCredits.toString()}
+		passType={$userData.subscriptionDetails.planType}
 	/>
-	<div class="flex flex-col w-[100%] mt-[50px]">
+    <hr class='w-full fixed mt-[40px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]' >
+	<div class="flex flex-col mt-[40px]">
 		{#each $chatsData as chat}
 			{#if chat.images.length === 0}
-				<button on:click={()=>{goto(`/chats/${chat.id}`)}}>
+				<button on:click={()=>{goto(`/chats/${chat.id}`)}} class={`w-screen`} >
 					<TextChatHistory
 						chatId={chat.id}
 						lastMessage={chat.data.lastMessagePreview}
@@ -115,7 +120,7 @@
 					/>
 				</button>
 			{:else}
-				<button on:click={()=>{goto(`/chats/${chat.id}`)}}>
+				<button on:click={()=>{goto(`/chats/${chat.id}`)}} class={`w-screen`} >
 					<ImgChatHistory
 						chatId={chat.id}
 						url={chat.images[0].imageUrl}

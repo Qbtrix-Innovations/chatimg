@@ -1,24 +1,24 @@
 export class Subscription {
-	userID: string;
 	startDate: Date;
 	endDate: Date;
 	planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
 	isActive: boolean;
+	totalCredits:number;
+	availableCredits:number;
 
 	constructor({
-		userID,
 		startDate,
 		endDate,
 		planType,
-		isActive
+		isActive,
+		totalCredits,
 	}: {
-		userID: string;
 		startDate: Date;
 		endDate: Date;
 		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
 		isActive: boolean;
+		totalCredits:number;
 	}) {
-		this.userID = userID;
 		this.startDate = startDate || new Date();
 		this.endDate = endDate || new Date(new Date().getTime() + 1 * 30 * 24 * 60 * 60 * 1000); //set default expiration date to 3 months from now
 		this.planType = planType || 'basic';
@@ -27,5 +27,7 @@ export class Subscription {
 		} else {
 			this.isActive = isActive;
 		}
+		this.totalCredits=totalCredits;
+		this.availableCredits=totalCredits;
 	}
 }

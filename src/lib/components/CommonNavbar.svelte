@@ -1,8 +1,9 @@
 <script>
+	import { ChevronLeft, Forward } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
 	import Button from './ui/button/button.svelte';
-	import clsx from 'clsx';
+	import clsx from 'clsx'; 
 	/**
 	 * @type {string}
 	 */
@@ -45,7 +46,16 @@
 	const handleProfile = () => {
 		goto('/userProfile');
 	};
-	console.log($userData.profilePictureUrl);
+	let sub = 'monthly';
+	// console.log($userData.profilePictureUrl);
+	/**
+	 * @type {string}
+	 */
+	 export let creditsLeft;
+	 /**
+	 * @type {string}
+	 */
+	  export let passType;
 </script>
 
 <nav class={clsx('w-screen fixed flex flex-row justify-between align-middle')}>
@@ -60,29 +70,17 @@
 			</Button>
 		{:else}
 			<Button on:click={handleLeftClick} class={clsx('bg-transparent hover:bg-transparent')}>
-				<svg
-					width="8"
-					height="14"
-					viewBox="0 0 8 14"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6"
-				>
-					<path
-						d="M7 13L1 7L7 1"
-						stroke="#263238"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
+				<ChevronLeft color='#263238' height=14 width=8 />
 			</Button>
 		{/if}
-		<div><span
-				class={clsx(
-					'text-transparent bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]'
-				)}>{headingLeft}</span
-			>
+		<div class={clsx('flex flex-col')} >
+			<div class={clsx('text-transparent text-sm p-0 m-0 bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]')}>
+				{headingLeft}
+			</div>
+			<div class={clsx('flex flex-row justify-start align-middle items-center ')} >
+				<div class={clsx('text-[10px] opacity-70 leading-3 text-[rgba(38,50,56,1)] font-medium')} >{creditsLeft} Credits left</div>
+				<div class={clsx('text-[8px] leading-[10px] font-semibold text-[rgba(125,125,125,1)] bg-[rgba(217,217,217,1)] rounded-sm ml-1 px-[5px]')} >{passType}</div>
+			</div>
 		</div>
 	</div>
 	<div class={clsx('flex flex-row justify-around align-middle items-center pr-2')}>
@@ -93,28 +91,7 @@
 				)}
 				on:click={handleSecondRightClick}
 			>
-				<svg
-					width="13"
-					height="13"
-					viewBox="0 0 13 13"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M8.125 9.20832L10.8333 6.49999L8.125 3.79166"
-						stroke="#607D8B"
-						stroke-width="1.2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-					<path
-						d="M2.16666 9.75V8.66667C2.16666 8.09203 2.39493 7.54093 2.80126 7.1346C3.20759 6.72827 3.75869 6.5 4.33332 6.5H10.8333"
-						stroke="#607D8B"
-						stroke-width="1.2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
+				<Forward height=13 width=13 color='#607D8B' strokeWidth=1.2 stroke-linecap="round" stroke-linejoin="round" />
 			</button>
 		{/if}
 		<div class={clsx('flex items-center align-middle')}>

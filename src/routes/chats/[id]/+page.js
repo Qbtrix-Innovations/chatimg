@@ -1,28 +1,24 @@
 import { db } from '$lib/services/firebase/firebase';
 import { error } from '@sveltejs/kit';
 import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
+import { getMessagesOfIndividualChatOrdered } from '../../../services/messageServices';
+import {getImagesOfIndividualChatOrdered} from '../../../services/imageService';
 // /** 
 //  * @type {import('./$types').PageLoad} 
 //  * */
 export const load = async({params})=>{
     /**
-     * @type {import("@firebase/firestore").DocumentData[]}
+     * @type {import("../../../lib/core/entities/Image").Image[]}
      */
     let imagesData = [];
+    
     /**
-     * @type {import("@firebase/firestore").DocumentData[]}
+     * @type {import("../../../lib/core/entities/Message").Message[]}
      */
     let MessagesData = [];
     try {
-        console.log(params.id);
-        const imgQuerySnap = query(collection(db, `chats/${params.id}/images`),orderBy('uploadedAt','asc'))
-        const querySnapshot = await getDocs(imgQuerySnap);
-        // Extract data from query snapshot
-        imagesData = querySnapshot.docs.map((doc) => doc.data());
-        const querySnap = query(collection(db, `chats/${params.id}/messages`),orderBy('sentAt','asc'));
-        const querySnapshotMsg = await getDocs(querySnap);
-        // Extract data from query snapshot
-        MessagesData = querySnapshotMsg.docs.map((doc) => doc.data());
+        imagesData = await getImagesOfIndividualChatOrdered(params.id);
+        MessagesData = await getMessagesOfIndividualChatOrdered(params.id);
         return {
             uid:params.id,
             imagesDataArray:imagesData,

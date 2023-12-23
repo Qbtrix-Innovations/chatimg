@@ -1,14 +1,16 @@
 <script>
+	import { Bot, CalendarDays, CheckCircle2, XCircle } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
-
+	import { goto } from '$app/navigation';
 	/**
 	 * @type {() => void}
 	 */
-	 export let onClick;
-	const buttonClicked = async ()=>{
+	export let onClick;
+	const buttonClicked = async () => {
 		onClick();
-	}
+	};
 	/**
 	 * @type {any}
 	 */
@@ -33,16 +35,16 @@
 	 * @type {string}
 	 */
 	export let buttonText;
-	/**
-	 * @type {any}
-	 */
-	export let icn;
 </script>
 
 <div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4')}>
 	<div class={clsx('flex flex-row justify-evenly')}>
 		<div class={clsx('text-black')}>
-			{@html icn}
+			{#if price === 0}
+				<Bot size="40" />
+			{:else}
+				<CalendarDays size="40" />
+			{/if}
 		</div>
 		<div class={clsx('font-bold text-[32px] leading-10 text-[#0b0914] w-3/4')}>
 			{h1}
@@ -54,22 +56,13 @@
 		</div>
 		{#each bullets as bullet}
 			<div class={clsx('flex flex-row my-2')}>
+				{#if bullet.isPresent}
+					<CheckCircle2 fill="#35353f" color="white" />
+				{:else}
+					<XCircle fill="#ee9393" color="white" />
+				{/if}
 				<div>
-					<svg
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M12.0001 2.00008C6.48612 2.00008 2.00012 6.48608 2.00012 12.0001C2.00012 17.5141 6.48612 22.0001 12.0001 22.0001C17.5141 22.0001 22.0001 17.5141 22.0001 12.0001C22.0001 6.48608 17.5141 2.00008 12.0001 2.00008ZM10.0011 16.4131L6.28812 12.7081L7.70012 11.2921L9.99912 13.5871L15.2931 8.29308L16.7071 9.70708L10.0011 16.4131Z"
-							fill="#35353F"
-						/>
-					</svg>
-				</div>
-				<div>
-					{bullet}
+					{bullet.text}
 				</div>
 			</div>
 		{/each}
@@ -84,13 +77,34 @@
 			class={clsx('font-normal text-[18px] leading-10 text-[#0b0914]')}>/{unitTime}</span
 		>
 	</div>
-	<Button
-		on:click={buttonClicked}
-		type='submit'
-		class={clsx(
-			'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
-		)}
-	>
-		{buttonText}
-	</Button>
+	{#if price === 0}
+		<!-- <form action="?/ownAPICheckoutSession" method="post">
+			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
+			<input type="hidden" name="lookup_key" value="Monthly Subscription" /> -->
+			<Button
+				id="checkout-and-portal-button"
+				type="submit"
+				on:click={()=>{goto('/userProfile')}}
+				class={clsx(
+					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
+				)}
+			>
+				{buttonText}
+			</Button>
+		<!-- </form> -->
+	{:else}
+		<form action="?/createCheckoutSession" method="post">
+			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
+			<input type="hidden" name="lookup_key" value="Monthly Subscription" />
+			<Button
+				id="checkout-and-portal-button"
+				type="submit"
+				class={clsx(
+					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
+				)}
+			>
+				{buttonText}
+			</Button>
+		</form>
+	{/if}
 </div>

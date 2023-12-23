@@ -36,7 +36,7 @@ async function checkStatus() {
     const userDoc = await getDoc(doc(db, 'users', currentUser.currentUser.uid));
     // @ts-ignore
     userData.set(userDoc.data());
-    // console.log(userData);
+    console.log(userData);
   }
   
   const userDataInstance = get(userData);
@@ -72,8 +72,8 @@ async function checkStatus() {
     // if the user has previous chats then we go to chats page where his chat history will be displayed.
     // otherwise the user will go to new chat page.
     if (chats.length > 0) {
+      // goto('/payment/cancel')
       goto('/home');
-      // goto('/userProfile');
     } else {
       goto('/newChat');
     }

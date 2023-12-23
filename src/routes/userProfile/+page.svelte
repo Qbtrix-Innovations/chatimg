@@ -1,4 +1,5 @@
 <script>
+	import { ArrowLeft } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { userData } from '$lib/stores/user/userStore';
@@ -15,11 +16,10 @@
 	let previousPage;
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
-		console.log(previousPage);
+		// console.log(previousPage);
 	});
 	function back() {
-		console.log(previousPage);
-		goto(previousPage);
+		goto('/home');
 	}
 	/**
 	 * @type {string}
@@ -53,9 +53,15 @@
 					planType: 'ownAPI'
 				}
 			});
+			
 			$userData.subscriptionDetails.startDate = startDate;
 			$userData.subscriptionDetails.endDate = finalDay;
 			$userData.subscriptionDetails.planType = 'ownAPI';
+			$userData.subscriptionDetails.isActive=true;
+			$userData.subscriptionDetails.isActive=true;
+			$userData.subscriptionDetails.totalCredits=1000;
+			$userData.subscriptionDetails.availableCredits=1000;
+
 		}
 	};
 
@@ -132,8 +138,6 @@
 								() => {
 									getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
 										photoUrl = downloadURL;
-
-										// Update firestore Database
 										// @ts-ignore
 										updateDocumentById('users', udis, {
 											profilePictureUrl: downloadURL
@@ -181,11 +185,8 @@
 					createdAt: currentState.createdAt,
 					lastLogin: currentState.lastLogin,
 					isPremium: currentState.isPremium,
-					subscriptionDetails: {
-						startDate: currentState.subscriptionDetails.startDate,
-						endDate: currentState.subscriptionDetails.endDate,
-						planType: currentState.subscriptionDetails.planType
-					}
+					subscriptionDetails:currentState.subscriptionDetails,
+					stripeCustomerId:currentState.stripeCustomerId
 				};
 			});
 			// @ts-ignore
@@ -206,18 +207,7 @@
 	>
 		<div class={clsx('flex flex-row justify-start items-center align-middle')}>
 			<Button on:click={back} class={clsx('bg-transparent hover:bg-transparent')}>
-				<svg
-					width="15"
-					height="16"
-					viewBox="0 0 15 16"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M0.292893 7.29289C-0.0976314 7.68342 -0.0976315 8.31658 0.292893 8.70711L6.65685 15.0711C7.04738 15.4616 7.68054 15.4616 8.07107 15.0711C8.46159 14.6805 8.46159 14.0474 8.07107 13.6569L2.41421 8L8.07107 2.34315C8.46159 1.95262 8.46159 1.31946 8.07107 0.928932C7.68054 0.538407 7.04738 0.538407 6.65686 0.928931L0.292893 7.29289ZM15 7L1 7L1 9L15 9L15 7Z"
-						fill="black"
-					/>
-				</svg>
+				<ArrowLeft width=15 height=16 color="black" />
 			</Button>
 			<div>My Profile</div>
 		</div>
@@ -227,6 +217,8 @@
 			on:click={Logout}>Logout</Button
 		>
 	</div>
+	<!--HR -->
+    <hr class='w-full fixed mt-[50px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]' >
 	<!-- User Profile Image Display -->
 	<div
 		class={clsx(
@@ -270,7 +262,7 @@
 		<button
 			class="font-semibold leading-4 text-sm text-[rgba(76,175,80,1)] opacity-80"
 			on:click={() => {
-				goto('/pricingCard');
+				goto('/pricingTable');
 			}}>Upgrade</button
 		>
 	</div>
@@ -300,7 +292,7 @@
 					</defs>
 				</svg>
 			</div>
-			<div>Day Pass</div>
+			<div>{$userData.subscriptionDetails.planType}</div>
 		</div>
 		<div class="font-[500] leading-4 text-sm text-[rgba(224,159,159,1)]">Expiring Today</div>
 	</div>

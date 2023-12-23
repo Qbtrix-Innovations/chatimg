@@ -7,7 +7,7 @@
 	 * @type {any}
 	 */
      export let url;
-     console.log(url);
+    //  console.log(url);
     /**
 	 * @type {any}
 	 */
@@ -20,7 +20,7 @@
 	 * @type {string}
 	 */
       export let chatId;
-     export const onClick=()=>{
+     const onClick=()=>{
         goto(`/chats/${chatId}`)
      }
 </script>

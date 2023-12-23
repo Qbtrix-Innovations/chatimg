@@ -17,7 +17,7 @@
 	export let imgUploadClicked;
 	const plusClicked = () => {
 		imgUploadClicked();
-		console.log('inside function');
+		// console.log('inside function');
 	};
 	const micClicked = () => {
 		recording = true;
@@ -69,31 +69,6 @@
 		placeholder="Type here ..."
 		bind:value={inpVal}
 	/>
-	<!-- <Button class="bg-transparent absolute sm:mr-[75%] mr-[55%]" on:click={micClicked}>
-		<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path
-				d="M8.14286 1.35715C7.60296 1.35715 7.08516 1.57162 6.70339 1.95339C6.32162 2.33516 6.10715 2.85296 6.10715 3.39286V8.14286C6.10715 8.68277 6.32162 9.20056 6.70339 9.58233C7.08516 9.9641 7.60296 10.1786 8.14286 10.1786C8.68277 10.1786 9.20056 9.9641 9.58233 9.58233C9.9641 9.20056 10.1786 8.68277 10.1786 8.14286V3.39286C10.1786 2.85296 9.9641 2.33516 9.58233 1.95339C9.20056 1.57162 8.68277 1.35715 8.14286 1.35715Z"
-				stroke="#69818C"
-				stroke-width="1.01786"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-			<path
-				d="M12.8929 6.78572V8.14286C12.8929 9.40264 12.3924 10.6108 11.5016 11.5016C10.6108 12.3924 9.40263 12.8929 8.14285 12.8929C6.88307 12.8929 5.67489 12.3924 4.7841 11.5016C3.8933 10.6108 3.39285 9.40264 3.39285 8.14286V6.78572"
-				stroke="#69818C"
-				stroke-width="1.01786"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-			<path
-				d="M8.14285 12.8929V14.9286"
-				stroke="#69818C"
-				stroke-width="1.01786"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-		</svg>
-	</Button> -->
 	<Button class="bg-transparent absolute sm:ml-[85%] ml-[85%]" on:click={sentClicked}>
 		<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path

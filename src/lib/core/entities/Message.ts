@@ -1,17 +1,20 @@
-export class Chat {
+import type { serverTimestamp } from '../../../../types.ts';
+
+export class Message {
     sentBy:string;
-    sentAt:Date;
+    sentAt:serverTimestamp;
     text:string;
     isEdited:boolean;
     isDeleted:boolean;
     
-    constructor({sentBy,sentAt,text,isEdited,isDeleted}:{    sentBy:string;
-        sentAt:Date,
+    constructor({sentBy,sentAt,text,isEdited,isDeleted}:{    
+        sentBy:string;
+        sentAt:serverTimestamp,
         text:string,
         isEdited:boolean,
         isDeleted:boolean,}){
             this.sentBy=sentBy;
-            this.sentAt=new Date(sentAt)|| new Date();
+            this.sentAt=sentAt;
             this.text=text;
             this.isEdited=isEdited || false;
             this.isDeleted=isDeleted || false;
