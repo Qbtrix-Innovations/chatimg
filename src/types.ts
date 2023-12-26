@@ -1,11 +1,8 @@
 import type firebase from "firebase/compat/app";
 
-
-
-
-export type serverTimestamp = firebase.firestore.Timestamp;
+export type serverTimestampType = firebase.firestore.Timestamp;
 export type Subscription={
-    userID: string;
+    // userID: string;
 	startDate: Date;
 	endDate: Date;
 	planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';

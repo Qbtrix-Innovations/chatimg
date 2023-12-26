@@ -8,12 +8,12 @@ export class AddNewUser {
         this.userRepository = userRepository;
     }
 
-    async execute(user:User): Promise<User> {
-        return await this.userRepository.addNewUser(user);
+    async execute(user:User): Promise<void> {
+        await this.userRepository.addNewUser(user);
     }
 }
 
-export class getUserFromId {
+export class GetUserFromId {
     private userRepository: UserRepository;
 
     constructor(userRepository: UserRepository) {

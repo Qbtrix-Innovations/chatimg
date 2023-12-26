@@ -20,51 +20,46 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from '$lib/services/firebase/firebase';
-// import { showApplyModal } from '../globalStore';
 import { goto } from '$app/navigation';
 import toast from "svelte-french-toast";
-// import { getUser } from "./userServer";
 import { userData } from "./userStore";
 import { authStore } from "../userauth/authStore";
+import type { User } from "$lib/core/entities/User";
+import type { Chat } from "$lib/core/entities/Chat";
+import { getChatsFromParticipantId } from "../../../services/chatService";
+import { getUserById } from "../../../services/userService";
 
 // Function to check the user's application status
 async function checkStatus() {
-  // console.log('Cheking status...')
-  // await getUser(get(userData).id)
   const currentUser = get(authStore); // Get the current value of the user store
   if (currentUser.currentUser!==null) {
-    const userDoc = await getDoc(doc(db, 'users', currentUser.currentUser.uid));
-    // @ts-ignore
-    userData.set(userDoc.data());
-    console.log(userData);
+    // const userDoc = await getDoc(doc(db, 'users', currentUser.currentUser.uid));
+    // userData.set(userDoc.data() as User);
+    // userData.subscribe((l)=>{console.log(l);})
+    const userDoc = await getUserById(currentUser.currentUser.uid);
+
+    userData.set(userDoc);
   }
-  
+
   const userDataInstance = get(userData);
   if (currentUser.currentUser?.uid !== undefined) {
-    // console.log('uid', currentUser.currentUser.uid)
-    // console.log(userDataInstance);
-    const chatsRef = collection(db, "chats");
-    const actualQuery = query(chatsRef, where('participants', 'array-contains', currentUser.currentUser.uid),orderBy('lastMessage'));
-    /**
-     * to implement orderBy for timestamp we have to set firebase indexes further discussion required in this aspect.
-     */
-    // ,orderBy('lastMessage', 'desc')
-    const querySnapshot = await getDocs(actualQuery);
-    /**
-     * @type {import("@firebase/firestore").DocumentData[]}
-     */
-    const chats = [];
-    querySnapshot.forEach((doc) => {
-      // Get each chat document's data
-      const data = doc.data();
-      // Add the document ID to the data object
-      data.id = doc.id;
-      // Add the data to the chats array
-      chats.push(data);
-    });
-    chats.forEach((chat)=>{
-      console.log(chat);
-    })
+    // const chatsRef = collection(db, "chats");
+    // const actualQuery = query(chatsRef, where('participants', 'array-contains', currentUser.currentUser.uid),orderBy('lastMessage'));
+
+    // const querySnapshot = await getDocs(actualQuery);
+    // const chats: import("@firebase/firestore").DocumentData[] = [];
+    // querySnapshot.forEach((doc) => {
+    //   // Get each chat document's data
+    //   const data = doc.data();
+    //   // Add the document ID to the data object
+    //   data.id = doc.id;
+    //   // Add the data to the chats array
+    //   chats.push(data);
+    // });
+    // chats.forEach((chat)=>{
+    //   console.log(chat);
+    // })
+    const chats:Chat[] = await getChatsFromParticipantId(currentUser.currentUser.uid);
 /**
  * To do set chats store asap.
  */

@@ -1,16 +1,15 @@
 <script>
 	import { db } from '$lib/services/firebase/firebase.js';
 	import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-
 	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
 	import ImgChatHistory from './components/ImgChatHistory.svelte';
 	import TextChatHistory from './components/TextChatHistory.svelte';
-	import { date } from 'zod';
-	import { onMount } from 'svelte';
 	import { userData } from '$lib/stores/user/userStore';
+
 	import { chatsData } from '$lib/stores/chats/chatStore';
 	import { goto, afterNavigate } from '$app/navigation';
-	import clsx from 'clsx';
+	import { getChatsFromParticipantId } from '../../services/chatService';
+
 	/**
 	 * @type {any}
 	 */
@@ -77,6 +76,7 @@
 				chat.images = imagesData;
 			});
 			console.log(chatData);
+			// chatData = await getChatsFromParticipantId($userData.id);
 			// @ts-ignore
 			chatsData.set(chatData);
 			
@@ -94,6 +94,7 @@
 			impFunc();
 		}
 	}
+
 </script>
 
 <div class="flex flex-col">

@@ -61,21 +61,18 @@ export class FirebaseChatAdapter implements ChatRepository {
         return chats;
 	}
 	
-	async getChatsByParticipants(participants: String[]): Promise<Chat[]> {
+	async getChatsByParticipant(participant: String): Promise<Chat[]> {
 		const chatsRef = collection(db, 'chats');
 		const actualQuery = query(
 			chatsRef,
-			where('participants', 'array-contains', participants),
+			where('participants', 'array-contains', participant),
 			orderBy('lastMessage')
 		);
 		const querySnapshot = await getDocs(actualQuery);
 		let chats: Chat[]=[];
 		querySnapshot.forEach((doc: { data: () => any; id: any; }) => {
-			// Get each chat document's data
 			const data = doc.data();
-			// Add the document ID to the data object
 			data.id = doc.id;
-			// Add the data to the chats array
 			chats.push(data);
 		});
         return chats;
@@ -100,34 +97,7 @@ export class FirebaseChatAdapter implements ChatRepository {
 		// @ts-ignore
 		return chatRet;
 	}
-	// async getChatById(id: string): Promise<ToDoItem> {
-	//     let todosRef = await getDoc(doc(db,'todos',id));
-	//     console.log(todosRef.data());
-	//     let todosReterived:ToDoItem = todosRef.data();
-	//     return todosReterived;
-	// }
 
-	// async add(toDoItem: ToDoItem): Promise<void> {
-	//     // console.log('reached execute in AddToDO.ts in usecases');
-	//     const todosRef = await addDoc(collection(db, `todos`),toDoItem);
-	//     console.log(todosRef);
-	//     // Firebase implementation
-	// }
 
-	// async getAll(): Promise<ToDoItem[]> {
-	//     const todos = await getDocs(collection(db,'todos'));
-	//     // @ts-ignore
-	//     const todosArray:Array<ToDoItem> = todos.docs.map((doc) => doc.data())
 
-	//     // Firebase implementation
-	//     return todosArray;
-	// }
-
-	// async update(toDoItem: ToDoItem): Promise<void> {
-	//     // Firebase implementation
-	// }
-
-	// async delete(id: string): Promise<void> {
-	//     // Firebase implementation
-	// }
 }

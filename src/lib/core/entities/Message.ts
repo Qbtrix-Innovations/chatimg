@@ -1,15 +1,15 @@
-import type { serverTimestamp } from '../../../../types.ts';
+import type { serverTimestampType } from '../../../types.js';
 
 export class Message {
     sentBy:string;
-    sentAt:serverTimestamp;
+    sentAt:serverTimestampType;
     text:string;
     isEdited:boolean;
     isDeleted:boolean;
     
     constructor({sentBy,sentAt,text,isEdited,isDeleted}:{    
         sentBy:string;
-        sentAt:serverTimestamp,
+        sentAt:serverTimestampType,
         text:string,
         isEdited:boolean,
         isDeleted:boolean,}){
@@ -18,6 +18,5 @@ export class Message {
             this.text=text;
             this.isEdited=isEdited || false;
             this.isDeleted=isDeleted || false;
-
     }
 }

@@ -154,7 +154,6 @@
 				apiKey: import.meta.env.VITE_OPENAI_API_KEY,
 				dangerouslyAllowBrowser: true
 			});
-			console.log(ImagesRef[0].imageUrl);
 			const response = await openai.chat.completions.create({
 				model: 'gpt-4-vision-preview',
 				max_tokens: 1024,

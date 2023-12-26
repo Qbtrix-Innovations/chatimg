@@ -2,10 +2,10 @@ import type { Subscription } from "./Subscription";
 
 export class User {
 	id:string;
-	username: string;
+	userName: string;
 	email: string;
 	phoneNumber: string;
-	dateOfBirth: Date;
+	dateOfBirth: Date | null |string;
 	profilePictureUrl: string;
 	createdAt: Date;
 	lastLogin:Date;
@@ -14,7 +14,7 @@ export class User {
 	stripeCustomerId:string;
 	constructor({
 		id,
-		username,
+		userName,
 		email,
 		phoneNumber,
 		dateOfBirth,
@@ -26,7 +26,7 @@ export class User {
 		lastLogin,
 	}: {
 		id:string;
-		username: string;
+		userName: string;
 		email: string;
 		phoneNumber: string;
 		dateOfBirth: Date;
@@ -38,7 +38,7 @@ export class User {
 		stripeCustomerId:string
 	}){
 		this.id=id;
-        this.username = username;
+        this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;

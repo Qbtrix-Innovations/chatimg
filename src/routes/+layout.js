@@ -1,7 +1,6 @@
 import { authStore } from "$lib/stores/userauth/authStore.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "$lib/services/firebase/firebase";
-// import { goto } from "$app/navigation";
 import { get } from "svelte/store"
 import { userData } from "$lib/stores/user/userStore";
 import checkStatus from "$lib/stores/user/initialNavigation";

@@ -1,10 +1,11 @@
 import { writable } from 'svelte/store';
 import { auth, db, googleProvider } from '../../services/firebase/firebase';
-import { collection, doc, setDoc, getDoc, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
+// import { collection, doc, setDoc, getDoc, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updatePassword, updateProfile } from 'firebase/auth';
 import { userData } from '../user/userStore';
 import { goto } from '$app/navigation';
 import Stripe from 'stripe';
+import { addNewUser, getUserById } from '../../../services/userService';
 /**
  * Svelte store to hold the Authentication Information.
  */
@@ -37,7 +38,6 @@ export const authHandlers = {
             let userCredentials = await createUserWithEmailAndPassword(auth, email, password);
             let finalDay = new Date();
             finalDay.setMonth(finalDay.getMonth() + 6);
-
             const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY);
             let customer;
             if (userInfoData.phoneNumber) {
@@ -52,49 +52,28 @@ export const authHandlers = {
                     email: userInfoData.email,
                 });                
             }
-            // set the user doc
-            /**
-            * @type {{
-            *          id:string,
-            *          stripeCustomerId:string,
-            *          userName:string,
-            *          email:string,
-            *          phoneNumber:string,
-            *          dateOfBirth:Date|null|Timestamp|serverTimestamp,
-            *          profilePictureUrl:string,
-            *          createdAt:Date|null|serverTimestamp,
-            *          lastLogin:Date|null|serverTimestamp, 
-            *          isPremium:boolean,
-            *          subscriptionDetails:{
-            *                                  startDate:Date|null|Timestamp|serverTimestamp,
-            *                                  endDate:Date|null|Timestamp|serverTimestamp,
-            *                                  planType:"basic"|"premium"
-            *                               }
-            *          }}
-            */
-            await setDoc(doc(db, 'users', userCredentials.user.uid), {
+            await addNewUser({
                 id: userCredentials.user.uid,
                 stripeCustomerId:customer.id,
                 userName: userInfoData.username,
                 email: userInfoData.email,
                 phoneNumber: userInfoData.phoneNumber !== null ? userInfoData.phoneNumber : '',
-                dateOfBirth: userInfoData.dateOfBirth !== null ? Timestamp.fromDate(userInfoData.dateOfBirth) : null,
+                // @ts-ignore
+                dateOfBirth: userInfoData.dateOfBirth !== null ? userInfoData.dateOfBirth : '',
                 profilePictureUrl: userInfoData.profilePictureUrl !== null ? userInfoData.profilePictureUrl : '',
-                createdAt: serverTimestamp(),
-                lastLogin: serverTimestamp(),
+                createdAt: new Date(),
+                lastLogin: new Date(),
                 isPremium: false,
                 subscriptionDetails: {
-                    startDate: Timestamp.fromDate(new Date()),
-                    endDate: Timestamp.fromDate(finalDay),
+                    startDate: new Date(),
+                    endDate: finalDay,
                     planType: "basic",
+                    isActive:true,
+                    totalCredits:3,
+                    availableCredits:3,
                 },
             });
-            const userDoc = (await getDoc(doc(db, 'users', userCredentials.user.uid))).data()
-            // get the user doc
-            // const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
-            // console.log(userDoc);
-            // update it in the store
-            // @ts-ignore
+            const userDoc = await getUserById(userCredentials.user.uid);
             userData.set(userDoc);
             authStore.update((currState) => ({ ...currState, currentUser: userCredentials.user }));
             // update the profile to include userName
@@ -120,7 +99,10 @@ export const authHandlers = {
         userInfoData) => {
         try {
             let userCredentials = await signInWithEmailAndPassword(auth, email, password);
-            const userDoc = await getDoc(doc(db, 'users', userCredentials.user.uid));
+            let userDoc;
+            if (userCredentials.user.uid) {
+                userDoc = await getUserById(userCredentials.user.uid);
+            }
             // @ts-ignore
             userData.set(userDoc.data());
             authStore.update((currState) => ({ ...currState, currentUser: userCredentials.user }));

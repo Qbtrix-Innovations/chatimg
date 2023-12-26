@@ -1,16 +1,14 @@
-// import type { Message } from "$lib/core/entities/Message";
-// import { AddNewMessage, getMessagesDataAsArrayInSortedOrder } from "$lib/core/useCases/messageManagement";
-// import { FirebaseMessageAdapter } from "../adapters/firebaseMessageAdapter";
-// const firebaseAdapter = new FirebaseMessageAdapter;
-// // const addNewChatUseCase = new AddNewChat(firebaseAdapter);
-// // const getAllChatsWithUserAsParticipant = new getUserChats(firebaseAdapter);
-// const addInitialMessageUseCase = new AddNewMessage(firebaseAdapter);
-// const getMessagesOfIndividualChatInOrder = new getMessagesDataAsArrayInSortedOrder(firebaseAdapter);
+import type { User } from '$lib/core/entities/User';
+import { AddNewUser, GetUserFromId } from '$lib/core/useCases/userManagement';
+import { FirebaseUserAdapter } from '../adapters/firebaseUserAdapter';
 
-// export const addMessageToChat = async (message:Message,chatId:string):Promise<Message>=>{
-//     return await addInitialMessageUseCase.execute(message,chatId);
-// }
+const firebaseAdapter = new FirebaseUserAdapter();
+const addUser = new AddNewUser(firebaseAdapter);
+const getUserUseCase = new GetUserFromId(firebaseAdapter);
 
-// export const getMessagesOfIndividualChatOrdered = async (chatId:string):Promise<Array<Message>>=>{
-//     return await getMessagesOfIndividualChatInOrder.execute(chatId);
-// }
+export const addNewUser = async (user: User): Promise<void> => {
+	return await addUser.execute(user);
+};
+export const getUserById = async (userId: string): Promise<User> => {
+	return await getUserUseCase.execute(userId);
+};
