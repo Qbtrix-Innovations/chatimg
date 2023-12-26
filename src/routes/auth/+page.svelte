@@ -82,7 +82,7 @@
 	<div class="font-semibold text-[14px] text-[#263238] mt-2 ml-4 fixed w-full z-20">Chat Img</div>
 	<div class="h-screen flex flex-col justify-end">
 		<div
-			class="w-full flex flex-col items-center bg-white h-[75%] rounded-tl-[38px] rounded-tr-[38px] shadow-[0px_4px_4px_0px_rgba(0, 0, 0, 0.07)]"
+			class="w-full flex flex-col items-center bg-white  min-h-[32rem] h-[50vh] rounded-tl-[38px] rounded-tr-[38px] shadow-[0px_4px_4px_0px_rgba(0, 0, 0, 0.07)]"
 		>
 			<div class="w-fit leading-4 text-[14px] font-semibold text-[rgba(38,50,56,1)] h-4 mt-[10%]">
 				{#if register}
