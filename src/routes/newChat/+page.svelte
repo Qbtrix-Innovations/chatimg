@@ -1,19 +1,17 @@
 <script>
-	import { Undo2 } from 'lucide-svelte';
-	import { text } from '@sveltejs/kit';
+	import { Undo2 } from 'lucide-svelte'
 	import { goto } from '$app/navigation';
 	import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
 	import { clsx } from 'clsx';
 	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 	import { app, auth, db } from '../../lib/services/firebase/firebase';
-	import { addDoc, collection, getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 	import { authStore } from '$lib/stores/userauth/authStore';
-	import { userData } from '$lib/stores/user/userStore';
 	import Compressor from 'compressorjs';
 	import OpenAI from 'openai';
 	import { addNewChatService } from '../../services/chatService';
 	import { addImageToChatService } from '../../services/imageService';
 	import { addMessageToChat } from '../../services/messageServices';
+    import {ImagePlus} from 'lucide-svelte';
 	
 	/**
 	 * @type {string | null | undefined}
@@ -270,33 +268,28 @@
 			<Undo2/>
 		</button>
 	</div>
-	<div class="mt-[70%] h-1/2 flex flex-col">
-		<div class="flex items-center justify-center active:scale-[85%] transition-transform">
-			<div
-				class="flex items-center justify-center w-[85%] rounded-2xl h-[58px] bg-gradient-to-t from-[rgba(76,175,80,1)] to-[rgba(100,197,104,0.43)] shadow-[0px_4px_3.7px_0px_rgba(0, 0, 0, 0.22)] border-dashed border-[2px] border-[rgba(200,200,200,1)]"
-			>
-				<label
-					class="w-64 flex flex-col items-center px-4 py-6 text-white rounded-lg tracking-wide cursor-pointer"
-				>
-					<span class="mt-2 text-base leading-normal">+ Upload Image</span>
-					<input
-						type="file"
-						accept="image/*;pdf/*"
-						name="file"
-						on:change={(/**@type {any}*/ e) => {
-							file = e.target.files[0];
-						}}
-						class="hidden"
-					/>
-				</label>
-			</div>
-		</div>
-		<div
-			class="flex mt-4 self-center h-[24px] w-1/2 opacity-[44%] font-medium text-[10px] text-center items-center leading-3"
-		>
-			Upload an image or take a photo by clicking here to start chatting.
-		</div>
-		<hr class="w-full mt-4 border-[0.2px] bg-[#eaeaea]" />
+	<div class="flex flex-col self-center mt-[80%] items-center justify-center w-[85%]  h-[26vh] shadow-[0px_4px_3.7px_0px_rgba(0,0,0,0.22)] border-dashed border-[2px] border-[rgba(200,200,200,1)]">
+		<label	class="w-full h-full flex flex-col items-center px-4 py-6 rounded-lg tracking-wide cursor-pointer">
+				<ImagePlus size=46 color="#bcc7c7" stroke-width=2.5 />
+                <div class="flex flex-col self-center">
+                    <div class="mt-2 text-base leading-normal self-center">
+                        <span class="text-[rgba(77,77,77,1)] leading-4 font-bold" >+</span> 
+                        <span class="text-[rgba(115,115,115,1)] leading-4 font-medium" >Upload Image</span>
+                    </div>
+                    <div class="flex mt-4 self-center h-[24px] w-3/4 opacity-[44%] font-medium text-[10px] text-center items-center leading-3">
+                        Upload an image or take a photo by clicking here to start chatting.
+                    </div>
+                </div>
+                <input
+					type="file"
+					accept="image/*;pdf/*"
+					name="file"
+					on:change={(/**@type {any}*/ e) => {
+						file = e.target.files[0];
+					}}
+					class="hidden"
+				/>
+			</label>
 	</div>
 	<div
 		class={clsx(
@@ -304,6 +297,7 @@
 		)}
 	>
 		<CommonMessageBar
+			onClickedImp={()=>{}}
 			bind:file
 			imgUploadClicked={completeUploadFunction}
 			sentMessageClicked={createNewChatFromMessage}

@@ -12,7 +12,7 @@
 	let password = '';
 	let confirmPassword = '';
 	let isChecked = false;
-	let register = true;
+	let register = false;
 	let reset = false;
 	let emailForPasswordReset = '';
 	let google_icon = `<svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">

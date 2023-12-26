@@ -31,10 +31,18 @@
 		await sentMessageClicked();
 	};
 	export let file;
+	/**
+	 * @type{any}
+	 */
+	export let onClickedImp;
+	function onClicked(){
+		onClickedImp();
+	}
 </script>
 
 <div
 	class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}
+	on:click={onClicked}
 >
 	<div
 		class={clsx(

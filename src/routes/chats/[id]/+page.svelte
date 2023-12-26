@@ -525,6 +525,7 @@
 			</div>
 		</div>
 		<CommonMessageBar
+			onClickedImp={()=>{}}
 			sentMessageClicked={sendMessage}
 			imgUploadClicked={() => {}}
 			bind:file
