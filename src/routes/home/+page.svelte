@@ -94,6 +94,10 @@
 			impFunc();
 		}
 	}
+	/**
+	* 	creditsLeft={$userData.subscriptionDetails.availableCredits.toString()}
+	*	passType={$userData.subscriptionDetails.planType}
+	*/
 </script>
 
 <div class="flex flex-col">
@@ -105,8 +109,8 @@
 		headingLeft={`Hi ${$userData.userName}`}
 		buttonTextRight="New"
 		shareAvailable="false"
-		creditsLeft={$userData.subscriptionDetails.availableCredits.toString()}
-		passType={$userData.subscriptionDetails.planType}
+		creditsLeft={"3"}
+		passType={"basic"}
 	/>
     <hr class='w-full fixed mt-[40px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]' >
 	<div class="flex flex-col mt-[40px]">
