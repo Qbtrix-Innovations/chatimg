@@ -4,7 +4,7 @@
 	import MessageBar from '$lib/components/MessageBar.svelte';
 	import { clsx } from 'clsx';
 	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-	import { app, auth, db } from '../../lib/services/firebase/firebase';
+	import { app, auth, db } from '../../lib/firebase/firebase';
 	import { authStore } from '$lib/stores/userauth/authStore';
 	import Compressor from 'compressorjs';
 	import OpenAI from 'openai';
