@@ -525,9 +525,8 @@
 			</div>
 		</div>
 		<MessageBar
-			onClickedImp={()=>{}}
+			onClickedNavigationToNewChat={false}
 			sentMessageClicked={sendMessage}
-			imgUploadClicked={() => {}}
 			bind:file
 			bind:inpVal={searchVal}
 			class="mt-[92vh]"

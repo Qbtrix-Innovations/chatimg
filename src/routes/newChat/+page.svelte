@@ -297,9 +297,8 @@
 		)}
 	>
 		<MessageBar
-			onClickedImp={()=>{}}
+			onClickedNavigationToNewChat={false}
 			bind:file
-			imgUploadClicked={completeUploadFunction}
 			sentMessageClicked={createNewChatFromMessage}
 			bind:inpVal={searchVal}
 			class="mt-8"

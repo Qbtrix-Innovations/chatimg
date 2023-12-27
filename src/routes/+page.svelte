@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { ImagePlus } from 'lucide-svelte';
 	import MessageBar from '$lib/components/MessageBar.svelte';
+
 	const handleRedirectToAuthPage = () => {
 		goto('/auth');
 	};
@@ -50,9 +51,8 @@
 		class={'flex fixed flex-row mt-[92vh] w-[90%] self-center justify-center items-center rounded-[21px]'}
 	>
 		<MessageBar
-			onClickedImp={handleRedirectToAuthPage}
+			onClickedNavigationToNewChat={true}
 			bind:file
-			imgUploadClicked={handleRedirectToAuthPage}
 			sentMessageClicked={handleRedirectToAuthPage}
 			bind:inpVal={messageVal}
 			class="mt-8"

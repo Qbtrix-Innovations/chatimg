@@ -2,6 +2,7 @@
 	import { clsx } from 'clsx';
 	import Button from './ui/button/button.svelte';
 	import Input from './ui/input/input.svelte';
+	import { goto } from '$app/navigation';
 	export { className as class };
 
 	/**
@@ -9,13 +10,6 @@
 	 */
 	export let inpVal;
 	let className = '';
-	/**
-	 * @type {() => void}
-	 */
-	export let imgUploadClicked;
-	const plusClicked = () => {
-		imgUploadClicked();
-	};
 	/**
 	 * @type {() => any}
 	 */
@@ -25,17 +19,19 @@
 	};
 	export let file;
 	/**
-	 * @type{any}
+	 * @type{boolean}
 	 */
-	export let onClickedImp;
-	function onClicked(){
-		onClickedImp();
+	export let onClickedNavigationToNewChat;
+	function initialNavigationToNewChat(){
+		if (onClickedNavigationToNewChat===true) {
+			goto('/auth');
+		}
 	}
 </script>
 
 <div
 	class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}
-	on:click={onClicked}
+	on:click={initialNavigationToNewChat}
 >
 	<div
 		class={clsx(
