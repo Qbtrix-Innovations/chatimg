@@ -94,8 +94,6 @@
 			impFunc();
 		}
 	}
-	// {$userData.subscriptionDetails.availableCredits.toString()}
-	// {$userData.subscriptionDetails.planType}
 </script>
 
 <div class="flex flex-col">
