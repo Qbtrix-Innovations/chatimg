@@ -5,7 +5,7 @@
 	import { userData } from '$lib/stores/user/userStore.js';
 	import clsx from 'clsx';
 	import { goto, afterNavigate } from '$app/navigation';
-	import { app, auth, db } from '$lib/services/firebase/firebase.js';
+	import { app, auth, db } from '$lib/firebase/firebase.js';
 	import { authHandlers, authStore } from '$lib/stores/userauth/authStore.js';
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import { doc, updateDoc } from 'firebase/firestore';

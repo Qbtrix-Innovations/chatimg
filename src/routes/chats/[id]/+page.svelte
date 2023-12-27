@@ -7,7 +7,7 @@
 	import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
-	import { app, db } from '$lib/services/firebase/firebase';
+	import { app, db } from '$lib/firebase/firebase';
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import Compressor from 'compressorjs';
 	import { ConversationChain, LLMChain, SequentialChain } from 'langchain/chains';

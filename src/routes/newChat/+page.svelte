@@ -5,7 +5,7 @@
 	import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
 	import { clsx } from 'clsx';
 	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-	import { app, auth, db } from '../../lib/services/firebase/firebase';
+	import { app, auth, db } from '../../lib/firebase/firebase';
 	import { addDoc, collection, getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 	import { authStore } from '$lib/stores/userauth/authStore';
 	import { userData } from '$lib/stores/user/userStore';

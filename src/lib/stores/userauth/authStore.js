@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { auth, db, googleProvider } from '../../services/firebase/firebase';
+import { auth, db, googleProvider } from '../../firebase/firebase';
 // import { collection, doc, setDoc, getDoc, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updatePassword, updateProfile } from 'firebase/auth';
 import { userData } from '../user/userStore';

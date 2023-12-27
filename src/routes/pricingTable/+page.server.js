@@ -1,4 +1,4 @@
-import { db } from "$lib/services/firebase/firebase";
+import { db } from "$lib/firebase/firebase";
 import { userData } from "$lib/stores/user/userStore";
 import { error, json, redirect } from "@sveltejs/kit";
 import { doc, updateDoc } from "firebase/firestore";

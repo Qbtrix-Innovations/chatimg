@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { db } from '$lib/services/firebase/firebase';
+	import { db } from '$lib/firebase/firebase';
 	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
 	import { doc, updateDoc } from 'firebase/firestore';

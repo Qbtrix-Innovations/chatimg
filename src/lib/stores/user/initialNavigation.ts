@@ -19,7 +19,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from '$lib/services/firebase/firebase';
+import { db } from '$lib/firebase/firebase';
 import { goto } from '$app/navigation';
 import toast from "svelte-french-toast";
 import { userData } from "./userStore";

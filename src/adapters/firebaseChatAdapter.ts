@@ -1,6 +1,6 @@
 import type { ChatRepository } from '$lib/core/repositories/chatRepository';
 import type { Chat } from '$lib/core/entities/Chat';
-import { db } from '$lib/services/firebase/firebase';
+import { db } from '$lib/firebase/firebase';
 import {
 	addDoc,
 	collection,
@@ -26,7 +26,7 @@ export class FirebaseChatAdapter implements ChatRepository {
 			const q = query(
 				chatsCollection,
 				where('participants', 'array-contains', id),
-				orderBy('lastMessage', 'asc')
+				orderBy('lastMessage', "desc")
 			);
 			const querySnapshot = await getDocs(q);
 			// Iterate through the chat documents

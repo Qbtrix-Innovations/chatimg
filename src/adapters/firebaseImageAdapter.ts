@@ -1,4 +1,4 @@
-import { app, db } from '$lib/services/firebase/firebase';
+import { app, db } from '$lib/firebase/firebase';
 import {
 	addDoc,
 	collection,

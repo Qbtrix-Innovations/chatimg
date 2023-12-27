@@ -1,4 +1,4 @@
-import { db } from '$lib/services/firebase/firebase';
+import { db } from '$lib/firebase/firebase';
 import { error } from '@sveltejs/kit';
 import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import { getMessagesOfIndividualChatOrdered } from '../../../services/messageServices';
