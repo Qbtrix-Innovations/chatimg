@@ -94,10 +94,6 @@
 			impFunc();
 		}
 	}
-	/**
-	* 	creditsLeft={$userData.subscriptionDetails.availableCredits.toString()}
-	*	passType={$userData.subscriptionDetails.planType}
-	*/
 </script>
 
 <div class="flex flex-col">
