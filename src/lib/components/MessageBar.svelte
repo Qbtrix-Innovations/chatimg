@@ -1,5 +1,4 @@
 <script>
-	import { FileType } from 'lucide-svelte';
 	import { clsx } from 'clsx';
 	import Button from './ui/button/button.svelte';
 	import Input from './ui/input/input.svelte';
@@ -10,19 +9,13 @@
 	 */
 	export let inpVal;
 	let className = '';
-	let recording = false;
 	/**
 	 * @type {() => void}
 	 */
 	export let imgUploadClicked;
 	const plusClicked = () => {
 		imgUploadClicked();
-		// console.log('inside function');
 	};
-	const micClicked = () => {
-		recording = true;
-	};
-	
 	/**
 	 * @type {() => any}
 	 */
@@ -62,14 +55,6 @@
 			/>
 		</label>
 	</div>
-	<!-- <Button
-		size="icon"
-		on:click={plusClicked}
-		class={clsx(
-			'flex bg-[#4caf50] m-2 pb-2 px-4 rounded-full text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] '
-		)}
-		>+
-	</Button> -->
 	<Input
 		class={clsx(
 			'sm:pl-10 sm:pr-12 px-10 w-[90%] rounded-[21px] h-[42px] bg-white shadow-[0px_3px_3.2px_0px_#D2D2D224] text-[#607D8B] leading-4 items-center text-[14px]'

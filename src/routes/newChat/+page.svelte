@@ -1,7 +1,7 @@
 <script>
 	import { Undo2 } from 'lucide-svelte'
 	import { goto } from '$app/navigation';
-	import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
+	import MessageBar from '$lib/components/MessageBar.svelte';
 	import { clsx } from 'clsx';
 	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 	import { app, auth, db } from '../../lib/services/firebase/firebase';
@@ -296,7 +296,7 @@
 			'flex fixed flex-row mt-[92vh] w-[90%] self-center justify-center items-center rounded-[21px]'
 		)}
 	>
-		<CommonMessageBar
+		<MessageBar
 			onClickedImp={()=>{}}
 			bind:file
 			imgUploadClicked={completeUploadFunction}
