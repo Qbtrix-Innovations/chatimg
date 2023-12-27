@@ -1,5 +1,6 @@
 import type { serverTimestampType } from '../../../types';
 import { Chat } from '../entities/Chat';
+import type { Image } from '../entities/Image';
 import type { ChatRepository } from '../repositories/chatRepository';
 
 export class AddNewChat {
@@ -51,5 +52,18 @@ export class UpdateLastMessagePreview {
         // });
         
         return await this.chatRepository.updateLastMessagePreviewOfChat(chatId,lastMessage);;
+    }
+}
+
+
+export class getChatAsIdMessageImageFormat {
+    private chatRepository: ChatRepository;
+
+    constructor(chatRepository: ChatRepository) {
+        this.chatRepository = chatRepository;
+    }
+
+    async execute(participantId:string): Promise<{ id: string; data: Chat; images: Image[] }[]> {
+        return await this.chatRepository.getChatWithIdMessageImageFormat(participantId);
     }
 }

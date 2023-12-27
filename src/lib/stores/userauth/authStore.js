@@ -104,7 +104,7 @@ export const authHandlers = {
                 userDoc = await getUserById(userCredentials.user.uid);
             }
             // @ts-ignore
-            userData.set(userDoc.data());
+            userData.set(userDoc);
             authStore.update((currState) => ({ ...currState, currentUser: userCredentials.user }));
         } catch (error) {
             console.log(error);

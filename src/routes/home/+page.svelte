@@ -1,6 +1,4 @@
 <script>
-	import { db } from '$lib/services/firebase/firebase.js';
-	import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
 	import ImgChatHistory from './components/ImgChatHistory.svelte';
 	import TextChatHistory from './components/TextChatHistory.svelte';
@@ -8,7 +6,7 @@
 
 	import { chatsData } from '$lib/stores/chats/chatStore';
 	import { goto, afterNavigate } from '$app/navigation';
-	import { getChatsFromParticipantId } from '../../services/chatService';
+	import { getChatAsIdDataImageInSortedOrder } from '../../services/chatService';
 
 	/**
 	 * @type {any}
@@ -29,69 +27,19 @@
 		return;
 	}
 	/**
-	 * @type {{
-					id: string,
-					data: import("@firebase/firestore").DocumentData,
-					images: import("@firebase/firestore").DocumentData[],
-				}[]}
+	 * @type {{ id: string; data: import("$lib/core/entities/Message"); images: import("$lib/core/entities/Image")[] }[]}
 	 */
 	let chatData = [];
 
 	const getChats = async () => {
-		const chatsCollection = collection(db, 'chats');
-		try {
-			// Query to find chat documents where participants array contains the user ID
-			// console.log(data.user?.id);
-			const id = $userData.id;
-			// console.log(id);
-			const q = query(chatsCollection, where('participants', 'array-contains', id),orderBy('lastMessage','asc'));
-			const querySnapshot = await getDocs(q);
-			// Iterate through the chat documents
-			// console.log('outside');
-			querySnapshot.forEach((chatDoc) => {
-				// console.log('inside');
-				// Extract data from the main chat document
-				const chatInfo = {
-					id: chatDoc.id,
-					data: chatDoc.data(),
-					images: []
-				};
-				// Update the chatData array
-				chatData.push(chatInfo);
-			});
-			/**
-			 * @param {string | any[]} array
-			 * @param {(arg0: any, arg1: number, arg2: any) => any} callback
-			 */
-			async function asyncForEach(array, callback) {
-				for (let index = 0; index < array.length; index++) {
-					await callback(array[index], index, array);
-				}
-			}
-			await asyncForEach(chatData, async (chat) => {
-				const imagesCollectionRef = collection(chatsCollection, chat.id, 'images');
-				const q2 = query(imagesCollectionRef,orderBy('uploadedAt','asc'))
-				const imagesQuerySnapshot = await getDocs(q2);
-				const imagesData = imagesQuerySnapshot.docs.map((imageDoc) => imageDoc.data());
-				chat.images = imagesData;
-			});
-			console.log(chatData);
-			// chatData = await getChatsFromParticipantId($userData.id);
+			// @ts-ignore
+			chatData = await getChatAsIdDataImageInSortedOrder($userData.id);
 			// @ts-ignore
 			chatsData.set(chatData);
-			
-		} catch (err) {
-			console.log(err);
-		}
 	};
 	$: {
 		if ($userData?.id) {
-			// console.log($userData.id);
-			const impFunc = async () => {
-				console.log($userData);
-				await getChats();
-			};
-			impFunc();
+			getChats();
 		}
 	}
 
