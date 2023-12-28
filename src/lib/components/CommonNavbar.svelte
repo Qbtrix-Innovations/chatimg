@@ -47,7 +47,6 @@
 		goto('/userProfile');
 	};
 	let sub = 'monthly';
-	// console.log($userData.profilePictureUrl);
 	/**
 	 * @type {string}
 	 */

@@ -22,8 +22,8 @@
 		headingLeft={`Hi ${$userData.userName}`}
 		buttonTextRight="Home"
 		shareAvailable="false"
-        creditsLeft="60"
-        passType="basic"
+		creditsLeft={"3"}
+		passType={"basic"}
 	/>
 	<div class={clsx(`flex flex-col justify-around items-center align-middle mt-[10vh] h-screen`)}>
 		<div class={clsx(`flex flex-col justify-between items-center align-middle mt-[20vh]`)}>

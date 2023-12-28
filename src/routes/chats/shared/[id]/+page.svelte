@@ -3,7 +3,7 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Button } from '$lib/components/ui/button';
 	// import CommonNavbar from '$lib/components/CommonNavbar.svelte';
-	// import CommonMessageBar from '$lib/components/CommonMessageBar.svelte';
+	// import MessageBar from '$lib/components/MessageBar.svelte';
 	import { goto, afterNavigate } from '$app/navigation';
 	// import { userData } from '$lib/stores/user/userStore';
 	// import { chatsData } from '$lib/stores/chats/chatStore';
@@ -251,7 +251,7 @@
 				shareAvailable="true"
 			/>
     
-    *		<CommonMessageBar
+    *		<MessageBar
 			sentMessageClicked={sendMessage}
 			imgUploadClicked={() => {}}
 			bind:file

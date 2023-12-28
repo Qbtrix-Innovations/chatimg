@@ -292,7 +292,7 @@
 					</defs>
 				</svg>
 			</div>
-			<div>{$userData.subscriptionDetails.planType}</div>
+			<div>Basic</div>
 		</div>
 		<div class="font-[500] leading-4 text-sm text-[rgba(224,159,159,1)]">Expiring Today</div>
 	</div>
