@@ -1,4 +1,4 @@
-<script nonce="abcxyz">
+<script nonce="abcxyz" lang="ts" >
 	import clsx from 'clsx';
 	import CustomCard from './components/CustomCard.svelte';
 	import CustomCard2 from './components/CustomCard2.svelte';

@@ -1,72 +1,42 @@
 // import type { Timestamp } from "firebase/firestore";
 import { writable } from 'svelte/store';
-export const userData = writable(
-	{
-		/**
-		 * @type {string}
-		 */
-		id: '',
-		/**
-		 * @type {string}
-		 */
-		stripeCustomerId: '',
-		/**
-		 * @type {string}
-		 */
-		userName: '',
-		/**
-		 * @type {string}
-		 */
-		email: '',
-		/**
-		 * @type {string}
-		 */
-		phoneNumber: '',
-		/**
-		 * @type null|Date|import('firebase/firestore').Timestamp|string
-		 */
-		dateOfBirth: null,
-		/**
-		 * @type {string}
-		 */
-		profilePictureUrl: '',
-		/**
-		 * @type null|Date|import('firebase/firestore').Timestamp
-		 */
-		createdAt: null,
-		/**
-		 * @type null|Date|import('firebase/firestore').Timestamp
-		 */
-		lastLogin: null,
-		/**
-		 * @type {boolean}
-		 */
-		isPremium: false,
-		subscriptionDetails: {
-			/**
-			 * @type {null|Date|import('firebase/firestore').Timestamp}
-			 */
-			startDate:new Date(),
-			/**
-			 * @type {null|Date|import('firebase/firestore').Timestamp}
-			 */
-			endDate: new Date(),
-			/**
-			 * @type {"basic"|"ownAPI"|"20credits/day"|"60credits/day"|"120credits/day"|"month"}
-			 */
-			planType: 'basic',
-			/**
-			 * @type{boolean}
-			 */
-			isActive: true,
-			/**
-			 * @type{number}
-			 */
-			totalCredits: 3,
-			/**
-			 * @type{number}
-			 */
-			availableCredits: 3
-		}
+const initialData: {
+	id: string;
+	stripeCustomerId: string;
+	userName: string;
+	email: string;
+	phoneNumber: string;
+	dateOfBirth: null | Date | import('firebase/firestore').Timestamp | string;
+	profilePictureUrl: string;
+	createdAt: null | Date | import('firebase/firestore').Timestamp;
+	lastLogin: null | Date | import('firebase/firestore').Timestamp;
+	isPremium: false;
+	subscriptionDetails: {
+		startDate: null | Date | import('firebase/firestore').Timestamp;
+		endDate: null | Date | import('firebase/firestore').Timestamp;
+		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
+		isActive: boolean;
+		totalCredits: number;
+		availableCredits: number;
+	};
+} = {
+	id: '',
+	stripeCustomerId: '',
+	userName: '',
+	email: '',
+	phoneNumber: '',
+	dateOfBirth: null,
+	profilePictureUrl: '',
+	createdAt: null,
+	lastLogin: null,
+	isPremium: false,
+	subscriptionDetails: {
+		startDate: null,
+		endDate: null,
+		planType: 'basic',
+		isActive: true,
+		totalCredits: 3,
+		availableCredits: 3
 	}
-);
+};
+export const userData = writable(initialData);

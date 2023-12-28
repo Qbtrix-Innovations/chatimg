@@ -1,4 +1,4 @@
-<script>
+<script lang="ts" >
 	import { ArrowLeft } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -10,10 +10,7 @@
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import { doc, updateDoc } from 'firebase/firestore';
 	import Compressor from 'compressorjs';
-	/**
-	 * @type {any}
-	 */
-	let previousPage;
+	let previousPage:any;
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
 		// console.log(previousPage);
@@ -21,18 +18,9 @@
 	function back() {
 		goto('/home');
 	}
-	/**
-	 * @type {string}
-	 */
-	let newPassword;
-
-	/**
-	 * @type {string}
-	 */
-	let apiKey;
-
+	let newPassword:string;
+	let apiKey:string;
 	export let data;
-
 	const saveApiKey = async () => {
 		if (apiKey && $userData.id) {
 			// console.log($userData.id);
@@ -78,24 +66,10 @@
 		localStorage.removeItem(key);
 		authHandlers.logout();
 	};
-
-	/**
-	 * @type {File}
-	 */
-	let file;
-	/**
-	 * @type {string}
-	 */
-	let photoUrl;
-	/**
-	 * @type {boolean}
-	 */
-	let uploading = false;
-	/**
-	 * @type {() => void}
-	 */
-	let completeUploadFunction;
-
+	let file:File;
+	let photoUrl:string;
+	let uploading:boolean = false;
+	let completeUploadFunction:() => void;
 	$: udis = $authStore.currentUser?.uid;
 	$: udun = $authStore.currentUser?.displayName;
 
@@ -106,10 +80,7 @@
 			const upload = () => {
 				const name = udis + '_' + udun + '_' + new Date().getTime();
 				const storageRef = ref(storage, name);
-				/**
-				 * @param {File | Blob} file
-				 */
-				function compressAndUploadImage(file) {
+				function compressAndUploadImage(file:File | Blob) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
 						maxWidth: 1920, // the max width of the output image
@@ -165,9 +136,9 @@
 		file && completeUploadFunction();
 	}
 	const updateDocumentById = async (
-		/** @type {string} */ collectionName,
-		/** @type {string} */ documentId,
-		/** @type {any} */ newData
+		collectionName:string,
+		documentId:string,
+		newData:any
 	) => {
 		const docRef = doc(db, collectionName, documentId);
 		try {
@@ -232,8 +203,9 @@
 				type="file"
 				accept="image/*;pdf/*"
 				name="file"
-				on:change={(/**@type {any}*/ e) => {
-					file = e.target.files[0];
+				on:change={(e) => {
+					// @ts-ignore
+					file = e.target?.files[0];
 				}}
 				class="hidden"
 			/>

@@ -241,7 +241,7 @@
 				<div
 					class="flex mt-4 self-center h-[24px] w-3/4 opacity-[44%] font-medium text-[10px] text-center items-center leading-3"
 				>
-					Upload an image or take a photo by clicking here to start chatting.
+					Upload a new image to start chatting.
 				</div>
 			</div>
 			<input

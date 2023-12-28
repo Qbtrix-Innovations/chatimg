@@ -8,30 +8,25 @@ import { addNewUser, getUserById } from '../../../services/userService';
 /**
  * Svelte store to hold the Authentication Information.
  */
-export const authStore = writable({
-    /**
-     * @type {boolean}
-     */
+const initialData:{
+    isLoading:boolean,
+    currentUser:import('firebase/auth').User|null
+} ={
     isLoading: true,
-    /**
-     * @type {import('firebase/auth').User|null}
-     */
     currentUser: null,
-});
+}
+export const authStore = writable(initialData);
 
 export const authHandlers = {
     signup: async (
-        /** @type {string} */ email,
-        /** @type {string} */ password,
-        /** @type {any} */ name,
-        /** @type {{ 
-         *          username: string; 
-         *          email: string; 
-         *          phoneNumber: null; 
-         *          dateOfBirth: Date|null; 
-         *          profilePictureUrl: null; 
-         * }} */
-        userInfoData
+        email:string,password:string,name:string,
+        userInfoData:{
+            username:string,
+            email:string,
+            phoneNumber:string|null,
+            dateOfBirth:Date|null,
+            profilePictureUrl:string|null
+        }
     ) => {
         try {
             let userCredentials = await createUserWithEmailAndPassword(auth, email, password);
@@ -86,17 +81,14 @@ export const authHandlers = {
         }
     },
     login: async (
-        /** @type {string} */ email,
-        /** @type {string} */ password,
-        /** @type {any} */ name,
-        /** @type {{ 
-         *          username: string; 
-         *          email: string; 
-         *          phoneNumber: null; 
-         *          dateOfBirth: Date|null; 
-         *          profilePictureUrl: null; 
-         * }} */
-        userInfoData) => {
+        email:string,password:string,name:string,
+        userInfoData:{
+          username: string; 
+          email: string; 
+          phoneNumber: string|null; 
+          dateOfBirth: Date|null; 
+          profilePictureUrl: null; 
+        }) => {
         try {
             let userCredentials = await signInWithEmailAndPassword(auth, email, password);
             let userDoc;
@@ -145,7 +137,7 @@ export const authHandlers = {
             console.log(error);
         }
     },
-    resetPassword: async (/** @type {string} */ email) => {
+    resetPassword: async (email:string) => {
         await sendPasswordResetEmail(auth, email);
     },
     googleLogin: async () => {
@@ -218,7 +210,7 @@ export const authHandlers = {
             console.log(error);
         }
     },
-    changePassword: async (/** @type {string} */ newPassword) => {
+    changePassword: async (newPassword:string) => {
         try {
             let user;
             let unsubscribe = authStore.subscribe((state) => {

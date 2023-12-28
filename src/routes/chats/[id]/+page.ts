@@ -1,21 +1,10 @@
-import { db } from '$lib/firebase/firebase';
-import { error } from '@sveltejs/kit';
-import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import { getMessagesOfIndividualChatOrdered } from '../../../services/messageServices';
 import {getImagesOfIndividualChatOrdered} from '../../../services/imageService';
-// /** 
-//  * @type {import('./$types').PageLoad} 
-//  * */
-export const load = async({params})=>{
-    /**
-     * @type {import("../../../lib/core/entities/Image").Image[]}
-     */
-    let imagesData = [];
-    
-    /**
-     * @type {import("../../../lib/core/entities/Message").Message[]}
-     */
-    let MessagesData = [];
+import type { Image } from '$lib/core/entities/Image';
+import type { Message } from '$lib/core/entities/Message';
+export const load:import('./$types').PageLoad = async({params})=>{
+    let imagesData:Image[] = [];
+    let MessagesData:Message[] = [];
     try {
         imagesData = await getImagesOfIndividualChatOrdered(params.id);
         MessagesData = await getMessagesOfIndividualChatOrdered(params.id);

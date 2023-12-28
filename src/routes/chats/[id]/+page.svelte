@@ -1,4 +1,4 @@
-<script>
+<script lang="ts" >
 	import { PromptTemplate } from 'langchain/prompts';
 	import { clsx } from 'clsx';
 	import { Skeleton } from '$lib/components/ui/skeleton';
@@ -14,7 +14,6 @@
 	import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 	import { ChatOpenAI } from 'langchain/chat_models/openai';
 	import { AIMessage, HumanMessage } from 'langchain/schema';
-	// import { json } from '@sveltejs/kit';
 	import {
 		addMessageToChat,
 		getMessagesOfIndividualChatOrdered
@@ -28,18 +27,9 @@
 	let uploading = false;
 	let email = $userData.email;
 	let compressedFile;
-	/**
-	 * @type {number}
-	 */
-	let compressedFileSize;
-	/**
-	 * @type {string}
-	 */
-	let compressedFileType;
-	/**
-	 * @type {string}
-	 */
-	let photoUrl;
+	let compressedFileSize:number;
+	let compressedFileType:string;
+	let photoUrl:string;
 	$: {
 		completeUploadFunction = () => {
 			uploading = true;
@@ -48,10 +38,7 @@
 			const upload = () => {
 				const name = email + '_' + new Date().getTime() + '_' + file.name;
 				const storageRef = ref(storage, name);
-				/**
-				 * @param {File | Blob} file
-				 */
-				function compressAndUploadImage(file) {
+				function compressAndUploadImage(file:File | Blob) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
 						maxWidth: 1920, // the max width of the output image
@@ -128,10 +115,7 @@
 			console.log('There was an error saving your information');
 		}
 	}
-	/**
-	 * @type {any}
-	 */
-	let previousPage;
+	let previousPage:any;
 	// @ts-ignore
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
@@ -189,23 +173,11 @@
 		// return;
 	};
 	let loading = false;
-
-	/**
-	 * @type {any}
-	 */
-	let file;
-	let images;
+	let file:any;
 	export let data;
-	let conv = data.MessagesDataArray;
-	/**
-	 * @type {string}
-	 */
-	let searchVal;
+	let searchVal:string;
 	const sendMessage = async () => {
 		// Add user message to chat
-		/**
-		 * type serverTimestamp
-		 */
 		const sa = {};
 		const messageRef = await addMessageToChat(
 			{
@@ -255,7 +227,7 @@
 	};
 	let copySuccess = false;
 
-	const copyToClipboard = (/** @type {string} */ inpVal) => {
+	const copyToClipboard = (inpVal:string) => {
 		let textToCopy = document.getElementById(inpVal)?.innerHTML;
 		const textarea = document.createElement('textarea');
 		// @ts-ignore
@@ -271,10 +243,7 @@
 		document.body.removeChild(textarea);
 	};
 
-	/**
-	 * @param {string} inpTxt
-	 */
-	async function getOpenAiReply(inpTxt) {
+	async function getOpenAiReply(inpTxt:string) {
 		const imageUrl = data.imagesDataArray[0].imageUrl;
 		let pastMessages = [];
 		for (let index = 0; index < data.MessagesDataArray.length; index++) {
@@ -355,10 +324,7 @@
 		});
 		return res2;
 	}
-	/**
-	 * @param {string} inpTxt
-	 */
-	async function getOpenAiReplyWithoutImage(inpTxt) {
+	async function getOpenAiReplyWithoutImage(inpTxt:string) {
 		let pastMessages = [];
 		for (let index = 0; index < data.MessagesDataArray.length; index++) {
 			const element = data.MessagesDataArray[index];
