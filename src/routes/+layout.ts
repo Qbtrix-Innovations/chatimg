@@ -5,7 +5,6 @@ import { get } from "svelte/store"
 import { userData } from "$lib/stores/user/userStore";
 import checkStatus from "$lib/stores/user/initialNavigation";
 
-// /** @type {import('./$types').PageLoad} */
 export async function load({ }) {
     try {
         onAuthStateChanged(auth, async (authUser) => {
@@ -13,7 +12,6 @@ export async function load({ }) {
                 authStore.update((currState)=>{
                     return {...currState,isLoading:false,currentUser:authUser}
                 });
-                // console.log('from layout', get(authStore))
                 checkStatus()
             } else {
                 authStore.update((currState)=>{

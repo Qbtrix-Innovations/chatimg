@@ -1,7 +1,7 @@
 export class Subscription {
 	startDate: Date;
 	endDate: Date;
-	planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
+	planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '140credits/day' | 'month';
 	isActive: boolean;
 	totalCredits:number;
 	availableCredits:number;
@@ -15,7 +15,7 @@ export class Subscription {
 	}: {
 		startDate: Date;
 		endDate: Date;
-		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
+		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '140credits/day' | 'month';
 		isActive: boolean;
 		totalCredits:number;
 	}) {

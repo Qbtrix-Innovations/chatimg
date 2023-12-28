@@ -1,4 +1,4 @@
-<script>
+<script lang="ts" >
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { db } from '$lib/firebase/firebase';
@@ -6,36 +6,18 @@
 	import clsx from 'clsx';
 	import { doc, updateDoc } from 'firebase/firestore';
 	import { CheckCircle2, TentTree } from 'lucide-svelte';
-	/**
-	 * @type {string}
-	 */
-	export let h1;
-	/**
-	 * @type {string}
-	 */
-	export let h2;
-	/**
-	 * @type {string}
-	 */
-	export let buttonText;
-	/**
-	 * @type {any}
-	 */
-	export let icn;
-	/**
-	 * @type {"20credits/day"|"60credits/day"|"140credits/day"}
-	 */
-	let plan = '20credits/day';
+	export let h1:string;
+	export let h2:string;
+	export let buttonText:string;
+	export let icn:any;
+	let plan:"20credits/day"|"60credits/day"|"140credits/day" = '20credits/day';
 	let bullet1 = '20 Credits - 1 credit = 1 chat.';
 	$: {
 		bullet1 = `${
 			plan === '20credits/day' ? '20' : plan === '60credits/day' ? '60' : '140'
 		} Credits - 1 credit = 1 chat.`;
 	}
-	/**
-	 * @type string[]
-	 */
-	let bullets = [bullet1, 'Chat with Image','Create Image'];
+	let bullets:string[] = [bullet1, 'Chat with Image','Create Image'];
 	$: {
 		bullets = [bullet1, 'Chat with Image','Create Image'];
 	}
@@ -116,6 +98,7 @@
 	<form action="?/createDailyCheckoutSession" method="post">
 		<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
 		<input type="hidden" name="type" bind:value={plan} />
+		<input type="hidden" name="csrf_token" value="your_generated_csrf_token">
 		<Button
 			type="submit"
 			class={clsx(

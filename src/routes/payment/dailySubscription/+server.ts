@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 
 export async function POST({request}){
-    const YOUR_DOMAIN = 'http://localhost:5173';
+    const YOUR_DOMAIN = import.meta.env.VITE_SITE_DOMAIN;
     const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" });
 
     const inputData = await request.formData();

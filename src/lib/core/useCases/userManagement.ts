@@ -25,3 +25,14 @@ export class GetUserFromId {
     }
 }
 
+export class GetUserByStripeId{
+    private userRepository: UserRepository;
+
+    constructor(userRepository: UserRepository) {
+        this.userRepository = userRepository;
+    }
+
+    async execute(stripeId:string): Promise<User> {
+        return await this.userRepository.getUserByStripeId(stripeId);
+    }
+}

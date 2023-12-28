@@ -100,4 +100,62 @@ export class FirebaseUserAdapter implements UserRepository {
 			throw error;
 		}
 	}
+	async getUserByStripeId(stripeId:string):Promise<User>{
+		try {
+			const userDoc = (await getDocs(query(collection(db, 'users'),where('stripeCustomerId','==',stripeId)))).docs[0].data() ;
+			// console.log(userDoc);
+			
+			const subDocs = await getDocs(
+				query(
+					collection(db, 'users', userDoc.id, 'subscriptionDetails'),
+					where('endDate', '>', new Date()),
+					where('isActive', '==', true),
+					orderBy('endDate'),
+					orderBy('startDate', 'asc')
+				)
+			);
+			const subs: Subscription[] = [];
+			subDocs.forEach((doc) => {
+				const data: Subscription = doc.data() as Subscription;
+				subs.push(data);
+			});
+			if (subs.length===0) {
+				subs.push({
+					startDate: new Date(),
+					endDate: new Date(new Date().getTime() + 1 * 30 * 24 * 60 * 60 * 1000),
+					planType: 'basic',
+					isActive: true,
+					totalCredits: 3,
+					availableCredits:3
+				});
+			}
+			console.log(userDoc?.createdAt);
+			
+			const newUser: User = {
+				id: userDoc.id,
+				userName: userDoc?.userName,
+				email: userDoc?.email,
+				phoneNumber: userDoc?.phoneNumber,
+				dateOfBirth: userDoc?.dateOfBirth,
+				profilePictureUrl: userDoc?.profilePictureUrl,
+				createdAt: new Date(userDoc?.createdAt.seconds * 1000),
+				lastLogin: new Date(userDoc?.lastLogin.seconds * 1000),
+				isPremium: userDoc?.isPremium,
+				stripeCustomerId: userDoc?.stripeCustomerId,
+				subscriptionDetails: {
+					startDate: subs[0].startDate,
+					endDate: subs[0].endDate,
+					planType: subs[0].planType,
+					isActive: subs[0].isActive,
+					totalCredits: subs[0].totalCredits,
+					availableCredits: subs[0].availableCredits
+				}
+			};
+			console.log(newUser);
+			return newUser;
+		} catch (error) {
+			throw error;
+		}
+	
+	}
 }

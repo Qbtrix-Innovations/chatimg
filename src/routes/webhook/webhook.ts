@@ -1,97 +1,75 @@
-import { json, error, redirect } from '@sveltejs/kit';
+import { db } from '$lib/firebase/firebase';
+import type { RequestHandler } from '@sveltejs/kit';
+import { addDoc, collection } from 'firebase/firestore';
 import Stripe from 'stripe';
-
-const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY);
-
+import { getUserByStripeId } from '../../services/userService';
+import { Subscription } from '$lib/core/entities/Subscription';
 // @ts-ignore
-export async function POST({ request }) {
-  // const { userInformation } = await request.json();
+export const post: RequestHandler = async ({request}) => {
+  const stripeSignature = request.headers.get('stripe-signature');
+  const endpointSecret = import.meta.env.VITE_STRIPE_WEBHOOKS_ENDPOINT_SECRET;
+  // const endpointSecret="";
+  const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY,{apiVersion:"2023-10-16",typescript:true});
+  if (!request.body || !stripeSignature || !endpointSecret) {
+    return{status:400};
+  }
 
-  //   const subscription = await stripe.subscriptions.create({
-  //     customer: userInformation.stripeCustomerId,
-  //     items: [
-  //       {
-  //         price: 'price_1OOMG1SDHqx7TTmQXveDfUBJ',
-  //       },
-  //     ],
-  //     payment_settings:{
-  //       payment_method_types: ['card'],
-  //     },
-  //   });
-  //   console.log(subscription);
-  //   console.log(subscription.status);
-  // return json({ paymentStatus:true }, { status: 201 });
   let event;
   const body = Buffer.from(await request.arrayBuffer());
-  console.log(body);
-  // Replace this endpoint secret with your endpoint's unique secret
-  // If you are testing with the CLI, find the secret by running 'stripe listen'
-  // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-  // at https://dashboard.stripe.com/webhooks
-  const endpointSecret = import.meta.env.VITE_STRIPE_WEBHOOKS_ENDPOINT_SECRET;
-  // Only verify the event if you have an endpoint secret defined.
-  // Otherwise use the basic event deserialized with JSON.parse
-  // if (endpointSecret) {
-  // Get the signature sent by Stripe
-  const signature = request.headers.get('stripe-signature');
+  
   try {
     event = stripe.webhooks.constructEvent(
       body,
-      signature,
+      stripeSignature,
       endpointSecret
     );
     console.log(event);
+    switch (event.type) {
+      case 'checkout.session.async_payment_failed':
+        const checkoutSessionAsyncPaymentFailed = event.data.object;
+        // Then define and call a function to handle the event checkout.session.async_payment_failed
+        break;
+      case 'checkout.session.async_payment_succeeded':
+        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+
+        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+        break;
+      case 'checkout.session.completed':
+        const checkoutSessionCompleted = event.data.object;
+        if (event.data.object.payment_status==="paid") {
+          // @ts-ignore
+          const curuser = await getUserByStripeId(event.data.object.customer);
+          await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
+            startDate:new Date(),
+            endDate:new Date(new Date().getTime()+1*30*24*60*60*1000),
+            planType:"month",
+            isActive:true,
+            totalCredits:500,
+          });
+        }
+        console.log("event.type: ",event.type);
+        console.log("event.data: ",event.data);
+        console.log("event.data.object: ",checkoutSessionCompleted);
+        // Then define and call a function to handle the event checkout.session.completed
+        break;
+      case 'checkout.session.expired':
+        const checkoutSessionExpired = event.data.object;
+        // Then define and call a function to handle the event checkout.session.expired
+        break;
+      case 'customer.created':
+        const customerCreated = event.data.object;
+        console.log(event.type);
+        console.log(customerCreated);
+        // Then define and call a function to handle the event customer.created
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+    return{status:200};
   } catch (err) {
     // @ts-ignore
     console.log(`⚠️  Webhook signature verification failed.`, err.message);
     // @ts-ignore
-    throw error(400, err.message);
+    return {status:400};
   }
-  // }
-  let subscription;
-  let status;
-  // Handle the event
-
-  switch (event.type) {
-    case "checkout.session.completed":
-      console.log(' checkout.session.completed');
-      break;
-    case "invoice.paid":
-      console.log("invoice.paid");
-      break;
-    case 'customer.subscription.trial_will_end':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription trial ending.
-      // handleSubscriptionTrialEnding(subscription);
-      break;
-    case 'customer.subscription.deleted':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription deleted.
-      // handleSubscriptionDeleted(subscriptionDeleted);
-      break;
-    case 'customer.subscription.created':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription created.
-      // handleSubscriptionCreated(subscription);
-      break;
-    case 'customer.subscription.updated':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription update.
-      // handleSubscriptionUpdated(subscription);
-      break;
-    default:
-      // Unexpected event type
-      console.log(`Unhandled event type ${event.type}.`);
-  }
-  // Return a 200 response to acknowledge receipt of the event
-  // response.send();
-  // throw error(200);
-}
+};

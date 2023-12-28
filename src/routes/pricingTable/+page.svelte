@@ -4,11 +4,7 @@
 	import CustomCard2 from './components/CustomCard2.svelte';
 	import { goto } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
-	// import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
-	// import { db } from '$lib/services/firebase/firebase';
-	// import { Stripe } from 'stripe';
 	import { ArrowLeft } from 'lucide-svelte';
-	import { redirect, text } from '@sveltejs/kit';
 	// import { loadStripe } from '@stripe/stripe-js';
 	export let data;
 	const EnterYourOwnApiKey = async () => {

@@ -1,40 +1,19 @@
-<script>
+<script lang="ts" >
 	import { Bot, CalendarDays, CheckCircle2, XCircle } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
 	import { goto } from '$app/navigation';
-	/**
-	 * @type {() => void}
-	 */
-	export let onClick;
+	export let onClick:()=>void;
 	const buttonClicked = async () => {
 		onClick();
 	};
-	/**
-	 * @type {any}
-	 */
-	export let bullets;
-	/**
-	 * @type {string}
-	 */
-	export let h1;
-	/**
-	 * @type {string}
-	 */
-	export let h2;
-	/**
-	 * @type {number}
-	 */
-	export let price;
-	/**
-	 * @type {string}
-	 */
-	export let unitTime;
-	/**
-	 * @type {string}
-	 */
-	export let buttonText;
+	export let bullets:any;
+	export let h1:string;
+	export let h2:string;
+	export let price:number;
+	export let unitTime:string;
+	export let buttonText:string;
 </script>
 
 <div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4')}>
@@ -96,6 +75,7 @@
 		<form action="?/createCheckoutSession" method="post">
 			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
 			<input type="hidden" name="lookup_key" value="Monthly Subscription" />
+			<input type="hidden" name="csrf_token" value="your_generated_csrf_token">
 			<Button
 				id="checkout-and-portal-button"
 				type="submit"
