@@ -1,18 +1,9 @@
-<script>
+<script lang='ts' >
 	import Button from './ui/button/button.svelte';
-	/**
-	 * @type {String}
-	 */
-	 export let text;
-	/**
-	 * @type {string}
-	 */
+	export let text:string;
 	let className = '';
 	export { className as class };
-	/**
-	 * @type {"submit" | "reset" | "button" | null | undefined}
-	 */
-	 export let type;
+	export let type:"submit" | "reset" | "button" | null | undefined;
 </script>
 
 <Button

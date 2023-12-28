@@ -1,60 +1,32 @@
-<script>
+<script lang='ts' >
 	import { ChevronLeft, Forward } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
 	import Button from './ui/button/button.svelte';
 	import clsx from 'clsx'; 
-	/**
-	 * @type {string}
-	 */
-	export let headingLeft;
 
-	/**
-	 * @type {string}
-	 */
-	export let buttonTextRight;
+	export let headingLeft:string;
+	export let buttonTextRight:string;
+	export let shareAvailable:string;
 
-	/**
-	 * @type {string}
-	 */
-	export let shareAvailable;
-	/**
-	 * @type {() => void}
-	 */
-	export let handleRightTextClick;
+	export let handleRightTextClick:() => void;
 	function handleRightClick() {
 		handleRightTextClick();
 	}
-	/**
-	 * @type {() => void}
-	 */
-	export let handleLeftTextClick;
+	export let handleBack:() => void;
 	function handleLeftClick() {
-		handleLeftTextClick();
+		handleBack();
 	}
-	/**
-	 * @type {() => void}
-	 */
-	export let handleSecondFromRightClick;
+	export let handleShare:() => void;
 	function handleSecondRightClick() {
-		handleSecondFromRightClick();
+		handleShare();
 	}
-	/**
-	 * @type {boolean}
-	 */
-	export let leftProfile;
+	export let leftProfile:boolean;
 	const handleProfile = () => {
 		goto('/userProfile');
 	};
-	let sub = 'monthly';
-	/**
-	 * @type {string}
-	 */
-	 export let creditsLeft;
-	 /**
-	 * @type {string}
-	 */
-	  export let passType;
+	export let creditsLeft:string;
+	export let passType:string;
 </script>
 
 <nav class={clsx('w-screen fixed flex flex-row justify-between align-middle')}>

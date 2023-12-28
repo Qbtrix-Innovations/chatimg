@@ -1,4 +1,4 @@
-import type { serverTimestampType } from '../../../types';
+import type { serverTimestampType } from '../../types';
 import { Chat } from '../entities/Chat';
 import type { Image } from '../entities/Image';
 import type { ChatRepository } from '../repositories/chatRepository';

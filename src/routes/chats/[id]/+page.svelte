@@ -3,7 +3,7 @@
 	import { clsx } from 'clsx';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Button } from '$lib/components/ui/button';
-	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
+	import CommonNavbar from '$lib/components/TopNavbar.svelte';
 	import MessageBar from '$lib/components/MessageBar.svelte';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { userData } from '$lib/stores/user/userStore';
@@ -391,8 +391,8 @@
 		<div class={clsx('flex flex-col w-full items-center')}>
 			<CommonNavbar
 				leftProfile={false}
-				handleLeftTextClick={back}
-				handleSecondFromRightClick={share}
+				handleBack={back}
+				handleShare={share}
 				handleRightTextClick={goToNewChat}
 				headingLeft={data.imagesDataArray.length > 0
 					? data.imagesDataArray[0].imageUrl.split('.com_')[1].split('?alt')[0].slice(14, 34) +

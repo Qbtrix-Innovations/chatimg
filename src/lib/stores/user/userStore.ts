@@ -46,11 +46,11 @@ export const userData = writable(
 			/**
 			 * @type {null|Date|import('firebase/firestore').Timestamp}
 			 */
-			startDate: null,
+			startDate:new Date(),
 			/**
 			 * @type {null|Date|import('firebase/firestore').Timestamp}
 			 */
-			endDate: null,
+			endDate: new Date(),
 			/**
 			 * @type {"basic"|"ownAPI"|"20credits/day"|"60credits/day"|"120credits/day"|"month"}
 			 */

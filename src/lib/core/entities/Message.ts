@@ -1,4 +1,4 @@
-import type { serverTimestampType } from '../../../types.js';
+import type { serverTimestampType } from '../../types.js';
 
 export class Message {
     sentBy:string;

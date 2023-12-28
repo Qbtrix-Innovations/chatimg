@@ -15,7 +15,7 @@ import {
 import type { UserRepository } from '$lib/core/repositories/userRepository';
 import type { User } from '$lib/core/entities/User';
 import type { Subscription } from '$lib/core/entities/Subscription';
-import type { serverTimestampType } from '../types';
+import type { serverTimestampType } from '../lib/types';
 export class FirebaseUserAdapter implements UserRepository {
 	async addNewUser(user: User): Promise<void> {
 		try {

@@ -1,29 +1,20 @@
-<script>
+<script lang="ts">
 	import { clsx } from 'clsx';
 	import Button from './ui/button/button.svelte';
 	import Input from './ui/input/input.svelte';
 	import { goto } from '$app/navigation';
 	export { className as class };
 
-	/**
-	 * @type {string}
-	 */
-	export let inpVal;
+	export let inpVal: string;
 	let className = '';
-	/**
-	 * @type {() => any}
-	 */
-	 export let sentMessageClicked;
+	export let sentMessageClicked: () => any;
 	const sentClicked = async () => {
 		await sentMessageClicked();
 	};
 	export let file;
-	/**
-	 * @type{boolean}
-	 */
-	export let onClickedNavigationToNewChat;
-	function initialNavigationToNewChat(){
-		if (onClickedNavigationToNewChat===true) {
+	export let onClickedNavigationToNewChat: boolean;
+	function initialNavigationToNewChat() {
+		if (onClickedNavigationToNewChat === true) {
 			goto('/auth');
 		}
 	}
@@ -44,8 +35,9 @@
 				type="file"
 				accept="image/*;pdf/*"
 				name="file"
-				on:change={(/**@type {any}*/ e) => {
-					file = e.target.files[0];
+				on:change={(e) => {
+					// @ts-ignore
+					file = e.target?.files[0];
 				}}
 				class="hidden"
 			/>

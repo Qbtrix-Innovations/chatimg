@@ -1,13 +1,6 @@
-<script>
-	/**
-	 * @type {boolean}
-	 */
-	 export let showModal;
-
-	/**
-	 * @type {HTMLDialogElement}
-	 */
-	let dialog;
+<script lang='ts' >
+	 export let showModal:boolean;
+	let dialog:HTMLDialogElement;
 
 	$: if (dialog && showModal) dialog.showModal();
 </script>

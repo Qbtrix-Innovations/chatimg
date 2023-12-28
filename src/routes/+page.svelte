@@ -1,31 +1,245 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { ImagePlus } from 'lucide-svelte';
 	import MessageBar from '$lib/components/MessageBar.svelte';
+	import { userData } from '$lib/stores/user/userStore';
+	import TopNavbar from '$lib/components/TopNavbar.svelte';
+
+	import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+	import { app, auth, db } from '$lib/firebase/firebase';
+	import { authStore } from '$lib/stores/userauth/authStore';
+	import Compressor from 'compressorjs';
+	import OpenAI from 'openai';
+	import { addNewChatService } from '../services/chatService';
+	import { addImageToChatService } from '../services/imageService';
+	import { addMessageToChat } from '../services/messageServices';
 
 	const handleRedirectToAuthPage = () => {
 		goto('/auth');
 	};
-	/**
-	 * @type{any}
-	 */
-	let file;
-	/**
-	 * @type{any}
-	 */
-	let messageVal;
-
+	let isUserLoggedIn: boolean = true;
+	if ($userData.id.length > 0) {
+		isUserLoggedIn = false;
+	}
+	let userName: string | null | undefined;
+	$: userName = $authStore?.currentUser?.displayName;
+	let email: string | null | undefined;
+	$: email = $authStore?.currentUser?.email;
+	let uploading = false;
+	let uid: string | undefined;
+	$: uid = $authStore?.currentUser?.uid;
+	let file: File;
+	let photoUrl: string;
+	let compressedFile: Blob | ArrayBuffer;
+	let compressedFileType: string;
+	let compressedFileSize: number;
+	let messageVal: string;
+	let completeUploadFunction: () => void;
+	$: {
+		completeUploadFunction = async () => {
+			uploading = true;
+			console.log('changed');
+			const storage = getStorage(app);
+			const upload = () => {
+				const name = email + '_' + new Date().getTime() + '_' + file.name;
+				const storageRef = ref(storage, name);
+				function compressAndUploadImage(file: File | Blob) {
+					new Compressor(file, {
+						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
+						maxWidth: 1024, // the max width of the output image
+						maxHeight: 1024, // the max height of the output image
+						success(result) {
+							// Create a file reference
+							compressedFile = result;
+							const uploadTask = uploadBytesResumable(storageRef, result);
+							compressedFileSize = result.size;
+							compressedFileType = file.type;
+							uploadTask.on(
+								'state_changed',
+								(snapshot) => {
+									const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+									console.log('Upload is ' + progress + '% done');
+									switch (snapshot.state) {
+										case 'paused':
+											console.log('Upload is paused');
+											break;
+										case 'running':
+											console.log('Upload is running');
+											break;
+									}
+								},
+								(error) => {
+									console.log(error);
+								},
+								() => {
+									getDownloadURL(uploadTask.snapshot.ref)
+										.then((downloadURL) => {
+											photoUrl = downloadURL;
+										})
+										.then(() => {
+											createNewChat();
+										});
+								}
+							);
+						},
+						error(err) {
+							console.log(err.message);
+						}
+					});
+				}
+				compressAndUploadImage(file);
+			};
+			file && upload();
+			uploading = false;
+		};
+		file && completeUploadFunction();
+	}
+	async function createNewChat() {
+		try {
+			const part = [uid];
+			// @ts-ignore
+			const chatsRef = await addNewChatService(part);
+			const img = {
+				uploadedBy: uid,
+				uploadedAt: new Date(),
+				imageUrl: photoUrl,
+				thumbnailUrl: photoUrl,
+				fileSize: compressedFileSize,
+				fileType: compressedFileType
+			};
+			// @ts-ignore
+			const ImagesRef = await addImageToChatService(img, chatsRef.id);
+			const openai = new OpenAI({
+				apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+				dangerouslyAllowBrowser: true
+			});
+			const response = await openai.chat.completions.create({
+				model: 'gpt-4-vision-preview',
+				max_tokens: 1024,
+				messages: [
+					{
+						role: 'user',
+						content: [
+							{
+								type: 'text',
+								text: 'Give a detailed description of the given image. This description will be further passed on to another Large Language Model where it will be used for answering various questions that are asked by the user. Only reply with the descriptino for the image and nothing more as the description will also be shown to the user.'
+							},
+							{
+								type: 'image_url',
+								image_url: {
+									url: `${ImagesRef[0].imageUrl}`,
+									detail: 'high'
+								}
+							}
+						]
+					}
+				]
+			});
+			const messagesRefOpenAI = await addMessageToChat(
+				{
+					sentBy: 'GPT',
+					// @ts-ignore
+					sentAt: {},
+					// @ts-ignore
+					text: `${response.choices[0].message.content}`,
+					isEdited: false,
+					isDeleted: false
+				},
+				chatsRef.id
+			);
+			goto(`/chats/${chatsRef.id}`);
+		} catch (err) {
+			console.log(err);
+			console.log('There was an error saving your information');
+		}
+	}
+	async function createNewChatFromMessage() {
+		if (messageVal.length > 0) {
+			try {
+				const part = [];
+				part.push(uid);
+				// @ts-ignore
+				const chatsRef = await addNewChatService(part);
+				const messageRef = await addMessageToChat(
+					{
+						// @ts-ignore
+						sentBy: uid,
+						// @ts-ignore
+						sentAt: {},
+						text: messageVal,
+						isEdited: false,
+						isDeleted: false
+					},
+					chatsRef.id
+				);
+				const openai = new OpenAI({
+					apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+					dangerouslyAllowBrowser: true
+				});
+				const response = await openai.chat.completions.create({
+					model: 'gpt-4-vision-preview',
+					max_tokens: 300,
+					messages: [
+						{
+							role: 'user',
+							content: [
+								{
+									type: 'text',
+									text: `${messageVal}`
+								}
+							]
+						}
+					]
+				});
+				const messagesRefOpenAI = await addMessageToChat(
+					{
+						sentBy: 'GPT',
+						// @ts-ignore
+						sentAt: {},
+						// @ts-ignore
+						text: response.choices[0].message.content,
+						isEdited: false,
+						isDeleted: false
+					},
+					chatsRef.id
+				);
+				goto(`/chats/${chatsRef.id}`);
+			} catch (err) {
+				console.log(err);
+				console.log('There was an error saving your information');
+			}
+		}
+	}
 </script>
 
 <div class="bg-[#f5f5f5] h-screen flex flex-col">
-	<div
-		class="font-semibold text-[14px] text-[#263238] mt-2 mx-4 flex flex-row justify-between align-middle items-center"
-	>
-		<div>Chat Img</div>
-		<button on:click={handleRedirectToAuthPage} class="bg-[rgba(76,175,80,0.81)] rounded-[10px] px-2">
-			<span class="text-xs font-medium leading-[14.5px] text-white">New</span>
-		</button>
-	</div>
+	{#if $userData.id.length > 0}
+		<TopNavbar
+			leftProfile={true}
+			handleBack={() => {}}
+			handleRightTextClick={() => {
+				goto('/newChat');
+			}}
+			handleShare={() => {}}
+			headingLeft={`Hi ${$userData.userName}`}
+			buttonTextRight="New"
+			shareAvailable="false"
+			creditsLeft={$userData.subscriptionDetails.availableCredits.toString()}
+			passType={$userData.subscriptionDetails.planType}
+		/>
+	{:else}
+		<div
+			class="font-semibold text-[14px] text-[#263238] mt-2 mx-4 flex flex-row justify-between align-middle items-center"
+		>
+			<div>Chat Img</div>
+			<button
+				on:click={handleRedirectToAuthPage}
+				class="bg-[rgba(76,175,80,0.81)] rounded-[10px] px-2"
+			>
+				<span class="text-xs font-medium leading-[14.5px] text-white">New</span>
+			</button>
+		</div>
+	{/if}
 	<div
 		class="flex flex-col self-center mt-[80%] items-center justify-center w-[85%] h-[26vh] shadow-[0px_4px_3.7px_0px_rgba(0,0,0,0.22)] border-dashed border-[2px] border-[rgba(200,200,200,1)]"
 	>
@@ -44,16 +258,35 @@
 					Upload an image or take a photo by clicking here to start chatting.
 				</div>
 			</div>
-			<button on:click={handleRedirectToAuthPage} class="hidden" />
+			{#if $userData.id.length > 0}
+				<input
+					type="file"
+					accept="image/*;pdf/*"
+					name="file"
+					on:change={(e) => {
+						// @ts-ignore
+						file = e.target?.files[0];
+					}}
+					class="hidden"
+				/>
+			{:else}
+				<button on:click={handleRedirectToAuthPage} class="hidden" />
+			{/if}
 		</label>
 	</div>
 	<div
 		class={'flex fixed flex-row mt-[92vh] w-[90%] self-center justify-center items-center rounded-[21px]'}
 	>
 		<MessageBar
-			onClickedNavigationToNewChat={true}
+			onClickedNavigationToNewChat={isUserLoggedIn}
 			bind:file
-			sentMessageClicked={handleRedirectToAuthPage}
+			sentMessageClicked={() => {
+				if (isUserLoggedIn) {
+					createNewChatFromMessage();
+				} else {
+					handleRedirectToAuthPage();
+				}
+			}}
 			bind:inpVal={messageVal}
 			class="mt-8"
 		/>

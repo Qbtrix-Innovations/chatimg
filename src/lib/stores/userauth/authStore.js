@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
 import { auth, db, googleProvider } from '../../firebase/firebase';
-// import { collection, doc, setDoc, getDoc, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updatePassword, updateProfile } from 'firebase/auth';
 import { userData } from '../user/userStore';
 import { goto } from '$app/navigation';
@@ -74,6 +73,7 @@ export const authHandlers = {
                 },
             });
             const userDoc = await getUserById(userCredentials.user.uid);
+            // @ts-ignore
             userData.set(userDoc);
             authStore.update((currState) => ({ ...currState, currentUser: userCredentials.user }));
             // update the profile to include userName
@@ -127,8 +127,8 @@ export const authHandlers = {
                     lastLogin: null,
                     isPremium: false,
                     subscriptionDetails: {
-                        startDate: null,
-                        endDate: null,
+                        startDate: new Date(),
+                        endDate: new Date(),
                         planType: "basic",
                         isActive:false,
                         availableCredits:0,
@@ -201,6 +201,7 @@ export const authHandlers = {
                 },
             });
             const userDoc = await getUserById(userCredentials.uid);
+            // @ts-ignore
             userData.set(userDoc);
             authStore.update((currState) => ({ ...currState, currentUser: userCredentials }));
             // update the profile to include userName

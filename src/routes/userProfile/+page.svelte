@@ -2,10 +2,10 @@
 	import { ArrowLeft } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { userData } from '$lib/stores/user/userStore.js';
+	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
 	import { goto, afterNavigate } from '$app/navigation';
-	import { app, auth, db } from '$lib/firebase/firebase.js';
+	import { app, auth, db } from '$lib/firebase/firebase';
 	import { authHandlers, authStore } from '$lib/stores/userauth/authStore.js';
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import { doc, updateDoc } from 'firebase/firestore';
@@ -61,7 +61,6 @@
 			$userData.subscriptionDetails.isActive=true;
 			$userData.subscriptionDetails.totalCredits=1000;
 			$userData.subscriptionDetails.availableCredits=1000;
-
 		}
 	};
 

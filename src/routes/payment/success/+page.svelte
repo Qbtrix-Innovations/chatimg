@@ -1,24 +1,21 @@
-<script>
+<script lang='ts' >
 	import { userData } from '$lib/stores/user/userStore';
-	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
+	import TopNavbar from '$lib/components/TopNavbar.svelte';
 	import clsx from 'clsx';
 	import { BadgeCheck, TentTree } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
-	/**
-	 * @type {any}
-	 */
-	let isChecked;
+	let isChecked:any;
 </script>
 
 <div class="flex flex-col justify-between items-center align-middle">
-	<CommonNavbar
+	<TopNavbar
 		leftProfile={true}
-		handleLeftTextClick={() => {}}
+		handleBack={() => {}}
 		handleRightTextClick={() => {
 			goto('/home');
 		}}
-		handleSecondFromRightClick={() => {}}
+		handleShare={() => {}}
 		headingLeft={`Hi ${$userData.userName}`}
 		buttonTextRight="Home"
 		shareAvailable="false"

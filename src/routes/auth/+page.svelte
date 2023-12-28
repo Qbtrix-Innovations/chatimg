@@ -1,4 +1,4 @@
-<script>
+<script lang="ts" >
 	import { authHandlers, authStore } from '$lib/stores/userauth/authStore';
 	import { clsx } from 'clsx';
 	import TextInput from './components/TextInput.svelte';
@@ -24,7 +24,7 @@
 	const resetPasswordHandler = async () => {
 		reset = true;
 	};
-	const handleSubmit = (/** @type {any} */ e) => {
+	const handleSubmit = (e: { preventDefault: () => void; }) => {
 		e.preventDefault();
 		// checking that all fields are filled
 		if (!email || !password || (register && !confirmPassword) || (register && !fullName)) {

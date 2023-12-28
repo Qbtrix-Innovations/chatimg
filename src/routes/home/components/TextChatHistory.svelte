@@ -1,17 +1,9 @@
-<script>
+<script lang='ts' >
 	import { goto } from '$app/navigation';
-    /**
-	 * @type {string}
-	 */
-     export let chatId;
-    /**
-	 * @type {string}
-	 */
-     export let lastMessage;
-    /**
-	 * @type {any}
-	 */
-     export let time;
+	import type { serverTimestampType } from '$lib/types';
+     export let chatId:string;
+     export let lastMessage:string;
+     export let time:serverTimestampType;
     const onClick=()=>{
 			goto(`/chats/${chatId}`);
     }

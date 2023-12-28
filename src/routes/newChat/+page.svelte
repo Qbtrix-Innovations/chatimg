@@ -1,5 +1,5 @@
-<script>
-	import { Undo2 } from 'lucide-svelte'
+<script lang="ts">
+	import { Undo2 } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import MessageBar from '$lib/components/MessageBar.svelte';
 	import { clsx } from 'clsx';
@@ -11,56 +11,24 @@
 	import { addNewChatService } from '../../services/chatService';
 	import { addImageToChatService } from '../../services/imageService';
 	import { addMessageToChat } from '../../services/messageServices';
-    import {ImagePlus} from 'lucide-svelte';
-	
-	/**
-	 * @type {string | null | undefined}
-	 */
-	let userName;
+	import { ImagePlus } from 'lucide-svelte';
+	import type { Image } from '$lib/core/entities/Image';
+
+	let userName: string | null | undefined;
 	$: userName = $authStore?.currentUser?.displayName;
-	/**
-	 * @type {string | null | undefined}
-	 */
-	let email;
+	let email: string | null | undefined;
 	$: email = $authStore?.currentUser?.email;
 	let uploading = false;
-	/**
-	 * @type {string | undefined}
-	 */
-	let uid;
+	let uid: string | undefined;
 	$: uid = $authStore?.currentUser?.uid;
-	/**
-	 * @type {File}
-	 */
-	let file;
-	/**
-	 * @type {string}
-	 */
-	let photoUrl;
-	/**
-	 * @type {Blob | ArrayBuffer}
-	 */
-	let compressedFile;
-	/**
-	 * @type {string}
-	 */
-	let compressedFileType;
-	/**
-	 * @type {number}
-	 */
-	let compressedFileSize;
-	/**
-	 * @type {import("../../lib/core/entities/Image").Image}
-	 */
-	let img;
-	/**
-	 * @type {string}
-	 */
-	let searchVal;
-	/**
-	 * @type {() => void}
-	 */
-	let completeUploadFunction;
+	let file: File;
+	let photoUrl: string;
+	let compressedFile: Blob | ArrayBuffer;
+	let compressedFileType: string;
+	let compressedFileSize: number;
+	let img: Image;
+	let messageVal: string;
+	let completeUploadFunction: () => void;
 	$: {
 		completeUploadFunction = async () => {
 			uploading = true;
@@ -69,10 +37,7 @@
 			const upload = () => {
 				const name = email + '_' + new Date().getTime() + '_' + file.name;
 				const storageRef = ref(storage, name);
-				/**
-				 * @param {File | Blob} file
-				 */
-				function compressAndUploadImage(file) {
+				function compressAndUploadImage(file: File | Blob) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
 						maxWidth: 1024, // the max width of the output image
@@ -118,21 +83,11 @@
 				}
 				compressAndUploadImage(file);
 			};
-			// photoUrl = await uploadImages(email,file,uid);
 			file && upload();
-			// if (file) {
-			// 	// @ts-ignore
-			// 	uploadImages(email,file,uid).then((img2)=>{
-			// 		img=img2;
-			// 	}).then(()=>{
-			// 		createNewChat();
-			// 	})
-			// }
 			uploading = false;
 		};
 		file && completeUploadFunction();
 	}
-
 	async function createNewChat() {
 		try {
 			const part = [uid];
@@ -193,7 +148,7 @@
 		}
 	}
 	async function createNewChatFromMessage() {
-		if (searchVal.length > 0) {
+		if (messageVal.length > 0) {
 			try {
 				const part = [];
 				part.push(uid);
@@ -205,7 +160,7 @@
 						sentBy: uid,
 						// @ts-ignore
 						sentAt: {},
-						text: searchVal,
+						text: messageVal,
 						isEdited: false,
 						isDeleted: false
 					},
@@ -224,7 +179,7 @@
 							content: [
 								{
 									type: 'text',
-									text: `${searchVal}`
+									text: `${messageVal}`
 								}
 							]
 						}
@@ -263,33 +218,49 @@
 				>
 			{/if}
 		</div>
-		<button on:click={()=>{goto('/home')}}>
-			<Undo2/>
+		<button
+			on:click={() => {
+				goto('/home');
+			}}
+		>
+			<Undo2 />
 		</button>
 	</div>
-	<div class="flex flex-col self-center mt-[80%] items-center justify-center w-[85%]  h-[26vh] shadow-[0px_4px_3.7px_0px_rgba(0,0,0,0.22)] border-dashed border-[2px] border-[rgba(200,200,200,1)]">
-		<label	class="w-full h-full flex flex-col items-center px-4 py-6 rounded-lg tracking-wide cursor-pointer">
-				<ImagePlus size=46 color="#bcc7c7" stroke-width=2.5 />
-                <div class="flex flex-col self-center">
-                    <div class="mt-2 text-base leading-normal self-center">
-                        <span class="text-[rgba(77,77,77,1)] leading-4 font-bold" >+</span> 
-                        <span class="text-[rgba(115,115,115,1)] leading-4 font-medium" >Upload Image</span>
-                    </div>
-                    <div class="flex mt-4 self-center h-[24px] w-3/4 opacity-[44%] font-medium text-[10px] text-center items-center leading-3">
-                        Upload an image or take a photo by clicking here to start chatting.
-                    </div>
-                </div>
-                <input
-					type="file"
-					accept="image/*;pdf/*"
-					name="file"
-					on:change={(/**@type {any}*/ e) => {
-						file = e.target.files[0];
-					}}
-					class="hidden"
-				/>
-			</label>
+	<div
+		class="flex flex-col self-center mt-[5%] items-center justify-center w-[85%] h-[26vh] rounded-xl border-[1px] border-[rgba(200,200,200,1)]"
+	>
+		<label
+			class="w-full h-full flex flex-col items-center px-4 py-6 rounded-lg tracking-wide cursor-pointer"
+		>
+			<ImagePlus size="46" color="#bcc7c7" stroke-width="2.5" />
+			<div class="flex flex-col self-center">
+				<div class="mt-2 text-base leading-normal self-center">
+					<span class="text-[rgba(77,77,77,1)] leading-4 font-bold">+</span>
+					<span class="text-[rgba(115,115,115,1)] leading-4 font-medium">Upload Image</span>
+				</div>
+				<div
+					class="flex mt-4 self-center h-[24px] w-3/4 opacity-[44%] font-medium text-[10px] text-center items-center leading-3"
+				>
+					Upload an image or take a photo by clicking here to start chatting.
+				</div>
+			</div>
+			<input
+				type="file"
+				accept="image/*;pdf/*"
+				name="file"
+				on:change={(e) => {
+					// @ts-ignore
+					file = e.target?.files[0];
+				}}
+				class="hidden"
+			/>
+		</label>
 	</div>
+	<hr
+		class={clsx(
+			'w-[90%] self-center fixed mt-[36vh] md:mt-[47vh] sm:mt-[44vh] opacity-40 border-[#607d8b] border-dashed border-t-2'
+		)}
+	/>
 	<div
 		class={clsx(
 			'flex fixed flex-row mt-[92vh] w-[90%] self-center justify-center items-center rounded-[21px]'
@@ -299,7 +270,7 @@
 			onClickedNavigationToNewChat={false}
 			bind:file
 			sentMessageClicked={createNewChatFromMessage}
-			bind:inpVal={searchVal}
+			bind:inpVal={messageVal}
 			class="mt-8"
 		/>
 	</div>

@@ -240,8 +240,8 @@
     /**
      * <CommonNavbar
 				leftProfile={false}
-				handleLeftTextClick={back}
-				handleSecondFromRightClick={share}
+				handleBack={back}
+				handleShare={share}
 				handleRightTextClick={goToNewChat}
 				headingLeft={data.imagesDataArray.length > 0
 					? data.imagesDataArray[0].imageUrl.split('.com_')[1].split('?alt')[0].slice(14, 34) +

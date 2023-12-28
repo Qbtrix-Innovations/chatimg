@@ -1,20 +1,18 @@
-<script>
-	import CommonNavbar from '$lib/components/CommonNavbar.svelte';
+<script lang="ts">
+	import TopNavbar from '$lib/components/TopNavbar.svelte';
 	import ImgChatHistory from './components/ImgChatHistory.svelte';
 	import TextChatHistory from './components/TextChatHistory.svelte';
 	import { userData } from '$lib/stores/user/userStore';
 
-	import { chatsData } from '$lib/stores/chats/chatStore';
+	import chatsData from '$lib/stores/chats/chatStore';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { getChatAsIdDataImageInSortedOrder } from '../../services/chatService';
+	import type { Image } from '$lib/core/entities/Image';
+	import type { Chat } from '$lib/core/entities/Chat';
 
-	/**
-	 * @type {any}
-	 */
-	let previousPage;
+	let previousPage: any;
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
-		// console.log(previousPage);
 	});
 	function back() {
 		console.log(previousPage);
@@ -26,42 +24,44 @@
 	function share() {
 		return;
 	}
-	/**
-	 * @type {{ id: string; data: import("$lib/core/entities/Message"); images: import("$lib/core/entities/Image")[] }[]}
-	 */
-	let chatData = [];
+
+	let chatData: { id: string; data: Chat; images: Image[] }[] = [];
 
 	const getChats = async () => {
-			// @ts-ignore
-			chatData = await getChatAsIdDataImageInSortedOrder($userData.id);
-			// @ts-ignore
-			chatsData.set(chatData);
+		chatData = await getChatAsIdDataImageInSortedOrder($userData.id);
+		chatsData.set(chatData);
 	};
 	$: {
 		if ($userData?.id) {
 			getChats();
 		}
 	}
-
 </script>
 
 <div class="flex flex-col">
-	<CommonNavbar
+	<TopNavbar
 		leftProfile={true}
-		handleLeftTextClick={back}
+		handleBack={back}
 		handleRightTextClick={createNewChat}
-		handleSecondFromRightClick={share}
+		handleShare={share}
 		headingLeft={`Hi ${$userData.userName}`}
 		buttonTextRight="New"
 		shareAvailable="false"
 		creditsLeft="3"
 		passType="basic"
 	/>
-    <hr class='w-full fixed mt-[40px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]' >
+	<hr
+		class="w-full fixed mt-[40px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]"
+	/>
 	<div class="flex flex-col mt-[40px]">
 		{#each $chatsData as chat}
 			{#if chat.images.length === 0}
-				<button on:click={()=>{goto(`/chats/${chat.id}`)}} class={`w-screen`} >
+				<button
+					on:click={() => {
+						goto(`/chats/${chat.id}`);
+					}}
+					class={`w-screen`}
+				>
 					<TextChatHistory
 						chatId={chat.id}
 						lastMessage={chat.data.lastMessagePreview}
@@ -69,7 +69,12 @@
 					/>
 				</button>
 			{:else}
-				<button on:click={()=>{goto(`/chats/${chat.id}`)}} class={`w-screen`} >
+				<button
+					on:click={() => {
+						goto(`/chats/${chat.id}`);
+					}}
+					class={`w-screen`}
+				>
 					<ImgChatHistory
 						chatId={chat.id}
 						url={chat.images[0].imageUrl}
@@ -81,6 +86,3 @@
 		{/each}
 	</div>
 </div>
-
-<style>
-</style>
