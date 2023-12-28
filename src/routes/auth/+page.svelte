@@ -234,7 +234,7 @@
 				</div>
 			</div>
 			<div class="flex flex-col h-7 w-[80%] bg-transparent">
-				<ExternalLoginButton text="Google" icn={google_icon} class="mt-5" />
+				<ExternalLoginButton handleAuthClick={async ()=>{await authHandlers.googleLogin()}} text="Google" icn={google_icon} class="mt-5"  />
 			</div>
 			<div class="mt-8 flex flex-row">
 				<div class="font-medium text-[9.59px] leading-[14.39px]">Forgot Password ?</div>

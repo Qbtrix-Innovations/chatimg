@@ -72,6 +72,8 @@ export class FirebaseUserAdapter implements UserRepository {
 					availableCredits:3
 				});
 			}
+			console.log(userDoc?.createdAt);
+			
 			const newUser: User = {
 				id: userId,
 				userName: userDoc?.userName,
@@ -92,7 +94,7 @@ export class FirebaseUserAdapter implements UserRepository {
 					availableCredits: subs[0].availableCredits
 				}
 			};
-			// console.log(newUser);
+			console.log(newUser);
 			return newUser;
 		} catch (error) {
 			throw error;

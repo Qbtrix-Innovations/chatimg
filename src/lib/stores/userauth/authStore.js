@@ -151,14 +151,70 @@ export const authHandlers = {
     googleLogin: async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential?.accessToken;
+            const userCredentials = await result.user;
+            console.log(userCredentials);
+            // const credential = GoogleAuthProvider.credentialFromResult(result);
+            // const token = credential?.accessToken;
+            // console.log(result.user.uid);
+            // console.log(user);
+            // console.log(credential);
+            // console.log(token);
+            let finalDay = new Date();
+            finalDay.setMonth(finalDay.getMonth() + 6);
+            const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY);
+            let customer;
+            if (userCredentials.phoneNumber) {
+                customer = await stripe.customers.create({
+                // @ts-ignore
+                name: userCredentials.displayName,
+                email: userCredentials.email,
+                phone:userCredentials.phoneNumber,
+              });                
+            }else{
+                customer = await stripe.customers.create({
+                    // @ts-ignore
+                    name: userCredentials.displayName,
+                    email: userCredentials.email,
+                });                
+            }
+            await addNewUser({
+                id: userCredentials.uid,
+                stripeCustomerId:customer.id,
+                // @ts-ignore
+                userName: userCredentials.displayName,
+                // @ts-ignore
+                email: userCredentials.email,
+                phoneNumber: userCredentials.phoneNumber !== null ? userCredentials.phoneNumber : '',
+                // @ts-ignore
+                dateOfBirth: '',
+                profilePictureUrl: userCredentials.photoURL !== null ? userCredentials.photoURL : '',
+                createdAt: new Date(),
+                lastLogin: new Date(),
+                isPremium: false,
+                subscriptionDetails: {
+                    startDate: new Date(),
+                    endDate: finalDay,
+                    planType: "basic",
+                    isActive:true,
+                    totalCredits:3,
+                    availableCredits:3,
+                },
+            });
+            const userDoc = await getUserById(userCredentials.uid);
+            userData.set(userDoc);
+            authStore.update((currState) => ({ ...currState, currentUser: userCredentials }));
+            // update the profile to include userName
+            // await updateProfile(userCredentials, { displayName: name });
+            // reload the user to get updated user
+            // await userCredentials.user.reload();
+            return userDoc;
         } catch (/**@type{any}*/error) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            const email = error.customData.email;
-            const credential = GoogleAuthProvider.credentialFromError(error);
+            // const errorCode = error.code;
+            // const errorMessage = error.message;
+            // const email = error.customData.email;
+            // const credential = GoogleAuthProvider.credentialFromError(error);
+            // console.log(errorCode);
+            console.log(error);
         }
     },
     changePassword: async (/** @type {string} */ newPassword) => {
