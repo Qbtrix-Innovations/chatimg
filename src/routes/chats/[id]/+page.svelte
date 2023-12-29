@@ -21,6 +21,7 @@
 	import { updateLastMessagePreviewByChatById } from '../../../services/chatService';
 	import { addIndividualImageToChatService } from '../../../services/imageService';
 	import { Clipboard, ThumbsDown, ThumbsUp } from 'lucide-svelte';
+	import { AspectRatio } from "$lib/components/ui/aspect-ratio";
 
 	const root = 'http://localhost:5173/';
 	let completeUploadFunction;
@@ -41,8 +42,8 @@
 				function compressAndUploadImage(file:File | Blob) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
-						maxWidth: 1920, // the max width of the output image
-						maxHeight: 1080, // the max height of the output image
+						maxWidth: 1024, // the max width of the output image
+						maxHeight: 1024, // the max height of the output image
 						success(result) {
 							// Create a file reference
 							compressedFile = result;
@@ -386,11 +387,15 @@
 					Loading...
 				</div>
 			{:else if data.imagesDataArray.length > 0}
-				<img
+			  <!-- <div class="w-[450px]"> -->
+				<!-- <AspectRatio ratio={16 / 9} class="bg-muted"> -->
+				  <img
 					src={`${data.imagesDataArray[0].imageUrl}`}
 					alt="..."
-					class={clsx('w-[85%] mt-[15%] fixed h-[25%] rounded-[8px] bg-[#d9d9d9] self-center')}
+					class={clsx('w-[85%] mt-[15%] fixed h-[25%] object-contain rounded-[8px] bg-[#d9d9d9] self-center')}
 				/>
+				<!-- </AspectRatio> -->
+			  <!-- </div> -->
 				<div
 					class={clsx(
 						'text-center fixed h-3 pt-1 mt-[33vh] md:mt-[44vh] sm:mt-[41vh]  opacity-50 w-fit font-normal text-[10px] leading-3 text-[#607d8b]'

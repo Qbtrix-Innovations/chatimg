@@ -83,8 +83,8 @@
 				function compressAndUploadImage(file:File | Blob) {
 					new Compressor(file, {
 						quality: 0.8, // the quality of the output image, the higher the better quality but larger file
-						maxWidth: 1920, // the max width of the output image
-						maxHeight: 1080, // the max height of the output image
+						maxWidth: 1024, // the max width of the output image
+						maxHeight: 1024, // the max height of the output image
 						success(result) {
 							// Create a file reference
 							const uploadTask = uploadBytesResumable(storageRef, result);

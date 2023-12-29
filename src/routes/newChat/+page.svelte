@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Undo2 } from 'lucide-svelte';
+	import { Loader2, Undo2 } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import MessageBar from '$lib/components/MessageBar.svelte';
 	import { clsx } from 'clsx';
@@ -13,7 +13,8 @@
 	import { addMessageToChat } from '../../services/messageServices';
 	import { ImagePlus } from 'lucide-svelte';
 	import type { Image } from '$lib/core/entities/Image';
-
+	import Modal from '$lib/components/Modal.svelte';
+	let waiting=false;
 	let userName: string | null | undefined;
 	$: userName = $authStore?.currentUser?.displayName;
 	let email: string | null | undefined;
@@ -32,6 +33,7 @@
 	$: {
 		completeUploadFunction = async () => {
 			uploading = true;
+			waiting=true;
 			console.log('changed');
 			const storage = getStorage(app);
 			const upload = () => {
@@ -72,6 +74,8 @@
 										})
 										.then(() => {
 											createNewChat();
+										}).then(()=>{
+											waiting=false;
 										});
 								}
 							);
@@ -274,4 +278,10 @@
 			class="mt-8"
 		/>
 	</div>
+	<Modal showModal={waiting} >
+		<div slot="header" >
+			Uploading
+		</div>
+		<Loader2 size=18 class="animate-spin self-center my-1"/>
+	</Modal>
 </div>

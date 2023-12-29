@@ -3,9 +3,8 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { addDoc, collection } from 'firebase/firestore';
 import Stripe from 'stripe';
 import { getUserByStripeId } from '../../services/userService';
-import { Subscription } from '$lib/core/entities/Subscription';
 // @ts-ignore
-export const post: RequestHandler = async ({request}) => {
+export const POST: RequestHandler = async ({request}) => {
   const stripeSignature = request.headers.get('stripe-signature');
   const endpointSecret = import.meta.env.VITE_STRIPE_WEBHOOKS_ENDPOINT_SECRET;
   // const endpointSecret="";
@@ -39,13 +38,46 @@ export const post: RequestHandler = async ({request}) => {
         if (event.data.object.payment_status==="paid") {
           // @ts-ignore
           const curuser = await getUserByStripeId(event.data.object.customer);
-          await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
-            startDate:new Date(),
-            endDate:new Date(new Date().getTime()+1*30*24*60*60*1000),
-            planType:"month",
-            isActive:true,
-            totalCredits:500,
-          });
+          switch (event.data.object.amount_total) {
+            case 1800:
+              await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
+                startDate:new Date(),
+                endDate:new Date(new Date().getTime()+1*30*24*60*60*1000),
+                planType:"month",
+                isActive:true,
+                totalCredits:500,
+              });   
+              break;
+            case 300:
+              await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
+                startDate:new Date(),
+                endDate:new Date(new Date().getTime()+24*60*60*1000),
+                planType:"20credits/day",
+                isActive:true,
+                totalCredits:20,
+              });
+            break;
+            case 500:
+              await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
+                startDate:new Date(),
+                endDate:new Date(new Date().getTime()+24*60*60*1000),
+                planType:"60credits/day",
+                isActive:true,
+                totalCredits:60,
+              });
+            break;
+            case 1200:
+              await addDoc(collection(db,'users',curuser.id,'subscriptionDetails'),{
+                startDate:new Date(),
+                endDate:new Date(new Date().getTime()+24*60*60*1000),
+                planType:"140credits/day",
+                isActive:true,
+                totalCredits:140,
+              });
+            break;
+            default:
+              break;
+          }
         }
         console.log("event.type: ",event.type);
         console.log("event.data: ",event.data);
