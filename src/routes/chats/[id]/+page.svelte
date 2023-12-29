@@ -10,10 +10,6 @@
 	import { app, db } from '$lib/firebase/firebase';
 	import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 	import Compressor from 'compressorjs';
-	import { ConversationChain, LLMChain, SequentialChain } from 'langchain/chains';
-	import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
-	import { ChatOpenAI } from 'langchain/chat_models/openai';
-	import { AIMessage, HumanMessage } from 'langchain/schema';
 	import {
 		addMessageToChat,
 		getMessagesOfIndividualChatOrdered
@@ -22,8 +18,9 @@
 	import { addIndividualImageToChatService } from '../../../services/imageService';
 	import { Clipboard, ThumbsDown, ThumbsUp } from 'lucide-svelte';
 	import { AspectRatio } from "$lib/components/ui/aspect-ratio";
+	import { getOpenAiReply, getOpenAiReplyWithoutImage } from '../../../services/llmService';
 
-	const root = 'http://localhost:5173/';
+	const root = `${import.meta.env.VITE_SITE_DOMAIN}/`;
 	let completeUploadFunction;
 	let uploading = false;
 	let email = $userData.email;
@@ -75,7 +72,7 @@
 											photoUrl = downloadURL;
 										})
 										.then(() => {
-											createNewChat();
+											saveNewImage();
 										});
 								}
 							);
@@ -92,7 +89,7 @@
 		};
 		file && completeUploadFunction();
 	}
-	async function createNewChat() {
+	async function saveNewImage() {
 		try {
 			const part = [];
 			part.push($userData.id);
@@ -205,9 +202,9 @@
 		// Get response from openAI and Langchain
 		let openAiResponse;
 		if (data.imagesDataArray.length > 0) {
-			openAiResponse = await getOpenAiReply(msgVal);
+			openAiResponse = await getOpenAiReply(msgVal,data);
 		} else {
-			openAiResponse = await getOpenAiReplyWithoutImage(msgVal);
+			openAiResponse = await getOpenAiReplyWithoutImage(msgVal,data);
 		}
 
 		// Add that message to backend
@@ -216,7 +213,7 @@
 				sentBy: 'GPT',
 				// @ts-ignore
 				sentAt: sa,
-				text: openAiResponse.content,
+				text: openAiResponse,
 				isEdited: false,
 				isDeleted: false
 			},
@@ -227,7 +224,6 @@
 		data.MessagesDataArray = await getMessagesOfIndividualChatOrdered(data.uid);
 	};
 	let copySuccess = false;
-
 	const copyToClipboard = (inpVal:string) => {
 		let textToCopy = document.getElementById(inpVal)?.innerHTML;
 		const textarea = document.createElement('textarea');
@@ -243,114 +239,6 @@
 		}
 		document.body.removeChild(textarea);
 	};
-
-	async function getOpenAiReply(inpTxt:string) {
-		const imageUrl = data.imagesDataArray[0].imageUrl;
-		let pastMessages = [];
-		for (let index = 0; index < data.MessagesDataArray.length; index++) {
-			const element = data.MessagesDataArray[index];
-			if (element.sentBy != 'GPT') {
-				pastMessages.push(new HumanMessage(element.text));
-			} else {
-				pastMessages.push(new AIMessage(element.text));
-			}
-		}
-		const chat = new ChatOpenAI({
-			openAIApiKey: import.meta.env.VITE_OPENAI_API_KEY,
-			modelName: 'gpt-4-vision-preview',
-			maxTokens: 300
-		});
-		const message = new HumanMessage({
-			content: [
-				{
-					type: 'text',
-					text: `${inpTxt}`
-				},
-				{
-					type: 'image_url',
-					image_url: {
-						url: `${imageUrl}`,
-						detail: 'high'
-					}
-				}
-			]
-		});
-		const response = await chat.call([message]);
-		const memory = new BufferMemory({
-			chatHistory: new ChatMessageHistory(pastMessages)
-		});
-		const model = new ChatOpenAI({
-			openAIApiKey: import.meta.env.VITE_OPENAI_API_KEY,
-			modelName: 'gpt-4',
-			maxTokens: 500
-		});
-		const template = `You are being given 4 inputs.\n
-				1st is description of the image which is the main point of this chat.\n
-				Image Description : ${data.MessagesDataArray[0].text}\n
-				2nd is message that user has sent now and wants a response to that.\n
-				{userMessageAndResponseFromVisionPreviewModel}
-				You also have access to users previous chats in the form of memory. 
-				history:{history}
-				Assume that response from gpt-4-vision-preview is not available to the user.
-				Provide only the final response that can be shown to the user.
-				`;
-		const promptTemplate = new PromptTemplate({
-			template,
-			// inputVariables: ['input']
-			inputVariables: ['userMessageAndResponseFromVisionPreviewModel', 'history']
-		});
-		const chain = new ConversationChain({
-			llm: model,
-			prompt: promptTemplate,
-			memory: memory,
-			outputKey: 'content'
-		});
-		const overallChain = new SequentialChain({
-			chains: [chain],
-			// inputVariables: ["input"],
-			inputVariables: ['userMessageAndResponseFromVisionPreviewModel', 'history'],
-			outputVariables: ['content'],
-			verbose: true
-			// memory: memory
-			// returnAll: true
-		});
-		const userMessageAndResponseFromVisionPreviewModel = `
-				User Message : ${inpTxt}\n
-				3rd is response to users latest message from the 'gpt-4-vision-preview' model.\n
-				Response from gpt-4-vision-preview : ${response.content}\n
-				`;
-		// console.log(userMessageAndResponseFromVisionPreviewModel);
-		const res2 = await overallChain.call({
-			userMessageAndResponseFromVisionPreviewModel: userMessageAndResponseFromVisionPreviewModel
-		});
-		return res2;
-	}
-	async function getOpenAiReplyWithoutImage(inpTxt:string) {
-		let pastMessages = [];
-		for (let index = 0; index < data.MessagesDataArray.length; index++) {
-			const element = data.MessagesDataArray[index];
-			if (element.sentBy != 'GPT') {
-				pastMessages.push(new HumanMessage(element.text));
-			} else {
-				pastMessages.push(new AIMessage(element.text));
-			}
-		}
-		const memory = new BufferMemory({
-			chatHistory: new ChatMessageHistory(pastMessages)
-		});
-		const model = new ChatOpenAI({
-			openAIApiKey: import.meta.env.VITE_OPENAI_API_KEY,
-			modelName: 'gpt-4',
-			maxTokens: 300
-		});
-		const chain = new ConversationChain({
-			llm: model,
-			memory: memory,
-			outputKey: 'content'
-		});
-		const response = await chain.call({ input: inpTxt });
-		return response;
-	}
 </script>
 
 <div class={clsx('bg-[#f5f5f5] h-[100vh]')}>
