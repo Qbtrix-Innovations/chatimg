@@ -14,7 +14,13 @@
 	import { ImagePlus } from 'lucide-svelte';
 	import type { Image } from '$lib/core/entities/Image';
 	import Modal from '$lib/components/Modal.svelte';
-	let waiting=false;
+	import {
+		getVisionAPIResponse,
+		getVisionAPIResponseWithoutImage
+	} from '../../services/llmService';
+	let waiting = false;
+	let waitingExtra = false;
+	let displayError = '';
 	let userName: string | null | undefined;
 	$: userName = $authStore?.currentUser?.displayName;
 	let email: string | null | undefined;
@@ -33,7 +39,7 @@
 	$: {
 		completeUploadFunction = async () => {
 			uploading = true;
-			waiting=true;
+			waiting = true;
 			console.log('changed');
 			const storage = getStorage(app);
 			const upload = () => {
@@ -74,8 +80,9 @@
 										})
 										.then(() => {
 											createNewChat();
-										}).then(()=>{
-											waiting=false;
+										})
+										.then(() => {
+											waiting = false;
 										});
 								}
 							);
@@ -93,63 +100,59 @@
 		file && completeUploadFunction();
 	}
 	async function createNewChat() {
-		try {
-			const part = [uid];
-			// @ts-ignore
-			const chatsRef = await addNewChatService(part);
-			const img = {
-				uploadedBy: uid,
-				uploadedAt: new Date(),
-				imageUrl: photoUrl,
-				thumbnailUrl: photoUrl,
-				fileSize: compressedFileSize,
-				fileType: compressedFileType
-			};
-			// @ts-ignore
-			const ImagesRef = await addImageToChatService(img, chatsRef.id);
-			const openai = new OpenAI({
-				apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-				dangerouslyAllowBrowser: true
-			});
-			const response = await openai.chat.completions.create({
-				model: 'gpt-4-vision-preview',
-				max_tokens: 1024,
-				messages: [
-					{
-						role: 'user',
-						content: [
-							{
-								type: 'text',
-								text: 'Give a detailed description of the given image. This description will be further passed on to another Large Language Model where it will be used for answering various questions that are asked by the user. Only reply with the descriptino for the image and nothing more as the description will also be shown to the user.'
-							},
-							{
-								type: 'image_url',
-								image_url: {
-									url: `${ImagesRef[0].imageUrl}`,
-									detail: 'high'
-								}
-							}
-						]
-					}
-				]
-			});
-			const messagesRefOpenAI = await addMessageToChat(
-				{
-					sentBy: 'GPT',
-					// @ts-ignore
-					sentAt: {},
-					// @ts-ignore
-					text: `${response.choices[0].message.content}`,
-					isEdited: false,
-					isDeleted: false
-				},
-				chatsRef.id
-			);
-			goto(`/chats/${chatsRef.id}`);
-		} catch (err) {
-			console.log(err);
-			console.log('There was an error saving your information');
+		const part = [uid];
+		// @ts-ignore
+		const chatsRef = await addNewChatService(part);
+		if (!(chatsRef.id.length > 1)) {
+			displayError = 'New Chat not created.Please Try again.';
+			return displayError;
 		}
+		const img = {
+			uploadedBy: uid,
+			uploadedAt: new Date(),
+			imageUrl: photoUrl,
+			thumbnailUrl: photoUrl,
+			fileSize: compressedFileSize,
+			fileType: compressedFileType
+		};
+		// @ts-ignore
+		const ImagesRef = await addImageToChatService(img, chatsRef.id);
+		if (!ImagesRef[0].imageUrl) {
+			displayError = 'Image not Uploaded.Please Try again.';
+			return displayError;
+		}
+		let response = await getVisionAPIResponse(ImagesRef);
+		let count = 0;
+		while (response === 'ERROR: Something went wrong. Please try again.') {
+			response = await getVisionAPIResponse(ImagesRef);
+			count++;
+			console.log(count);
+			if (count > 1) {
+				waitingExtra = true;
+			}
+			if (count > 5) break; // If it fails to send the request for more than 5 times, stop trying
+		}
+		if (count > 5 && response === 'ERROR: Something went wrong. Please try again.') {
+			displayError = 'Could not get Vision API Response. Please try again.';
+			return displayError;
+		}
+		const messagesRefOpenAI = await addMessageToChat(
+			{
+				sentBy: 'GPT',
+				// @ts-ignore
+				sentAt: {},
+				// @ts-ignore
+				text: `${response}`,
+				isEdited: false,
+				isDeleted: false
+			},
+			chatsRef.id
+		);
+		if (!messagesRefOpenAI.text) {
+			displayError = 'Could not save Vision API Response. Please try again.';
+			return displayError;
+		}
+		goto(`/chats/${chatsRef.id}`);
 	}
 	async function createNewChatFromMessage() {
 		if (messageVal.length > 0) {
@@ -158,6 +161,10 @@
 				part.push(uid);
 				// @ts-ignore
 				const chatsRef = await addNewChatService(part);
+				if (!(chatsRef.id.length > 1)) {
+					displayError = 'New Chat not created.Please Try again.';
+					return displayError;
+				}
 				const messageRef = await addMessageToChat(
 					{
 						// @ts-ignore
@@ -170,37 +177,41 @@
 					},
 					chatsRef.id
 				);
-				const openai = new OpenAI({
-					apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-					dangerouslyAllowBrowser: true
-				});
-				const response = await openai.chat.completions.create({
-					model: 'gpt-4-vision-preview',
-					max_tokens: 300,
-					messages: [
-						{
-							role: 'user',
-							content: [
-								{
-									type: 'text',
-									text: `${messageVal}`
-								}
-							]
-						}
-					]
-				});
+				if (!messageRef.text) {
+					displayError = 'Could not save your message. Please try again.';
+					return displayError;
+				}
+				let response = await getVisionAPIResponseWithoutImage(messageVal);
+				let count = 0;
+				while (response === 'ERROR: Something went wrong. Please try again.') {
+					response = await getVisionAPIResponseWithoutImage(messageVal);
+					count++;
+					console.log(count);
+					if (count > 1) {
+						waitingExtra = true;
+					}
+					if (count > 5) break; // If it fails to send the request for more than 5 times, stop trying
+				}
+				if (count > 5 && response === 'ERROR: Something went wrong. Please try again.') {
+					displayError = 'Could not get Vision API Response. Please try again.';
+					return displayError;
+				}
 				const messagesRefOpenAI = await addMessageToChat(
 					{
 						sentBy: 'GPT',
 						// @ts-ignore
 						sentAt: {},
 						// @ts-ignore
-						text: response.choices[0].message.content,
+						text: response,
 						isEdited: false,
 						isDeleted: false
 					},
 					chatsRef.id
 				);
+				if (!messagesRefOpenAI.text) {
+					displayError = 'Could not save Vision API Response. Please try again.';
+					return displayError;
+				}
 				goto(`/chats/${chatsRef.id}`);
 			} catch (err) {
 				console.log(err);
@@ -278,10 +289,22 @@
 			class="mt-8"
 		/>
 	</div>
-	<Modal showModal={waiting} >
-		<div slot="header" >
+	<Modal showModal={waiting} permissionToCloseModal={displayError.length > 1}>
+		<div
+			slot="header"
+			class="bg-transparent text-transparent bg-clip-text bg-gradient-to-t from-[rgba(0,217,24,1)] to-[rgba(0,169,19,1)]"
+		>
 			Uploading
 		</div>
-		<Loader2 size=18 class="animate-spin self-center my-1"/>
+		<div class="flex flex-col">
+			{#if waitingExtra}
+				<div class="text-center">
+					The operation is taking longer than usual.Please wait for sometime.
+				</div>
+				<br />
+				<div class="text-red text-center">{displayError}</div>
+			{/if}
+			<Loader2 size="18" class="animate-spin self-center my-1" />
+		</div>
 	</Modal>
 </div>
