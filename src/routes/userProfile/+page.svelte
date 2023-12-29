@@ -46,7 +46,7 @@
 			$userData.subscriptionDetails.endDate = finalDay;
 			$userData.subscriptionDetails.planType = 'ownAPI';
 			$userData.subscriptionDetails.isActive=true;
-			$userData.subscriptionDetails.isActive=true;
+			$userData.subscriptionDetails.sid="ownAPI";
 			$userData.subscriptionDetails.totalCredits=1000;
 			$userData.subscriptionDetails.availableCredits=1000;
 		}

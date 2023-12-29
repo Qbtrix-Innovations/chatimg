@@ -59,6 +59,7 @@ export const authHandlers = {
                 lastLogin: new Date(),
                 isPremium: false,
                 subscriptionDetails: {
+                    sid:"newSubscription",
                     startDate: new Date(),
                     endDate: finalDay,
                     planType: "basic",
@@ -119,6 +120,7 @@ export const authHandlers = {
                     lastLogin: null,
                     isPremium: false,
                     subscriptionDetails: {
+                        sid:"newSubscription",
                         startDate: new Date(),
                         endDate: new Date(),
                         planType: "basic",
@@ -184,6 +186,7 @@ export const authHandlers = {
                 lastLogin: new Date(),
                 isPremium: false,
                 subscriptionDetails: {
+                    sid:"newSubscription",
                     startDate: new Date(),
                     endDate: finalDay,
                     planType: "basic",

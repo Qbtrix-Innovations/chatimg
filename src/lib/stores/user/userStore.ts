@@ -12,6 +12,7 @@ const initialData: {
 	lastLogin: null | Date | import('firebase/firestore').Timestamp;
 	isPremium: false;
 	subscriptionDetails: {
+		sid:string|null;
 		startDate: null | Date | import('firebase/firestore').Timestamp;
 		endDate: null | Date | import('firebase/firestore').Timestamp;
 		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '120credits/day' | 'month';
@@ -31,6 +32,7 @@ const initialData: {
 	lastLogin: null,
 	isPremium: false,
 	subscriptionDetails: {
+		sid:null,
 		startDate: null,
 		endDate: null,
 		planType: 'basic',

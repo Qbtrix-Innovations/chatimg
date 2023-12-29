@@ -1,4 +1,5 @@
 export class Subscription {
+	sid:string|null;
 	startDate: Date;
 	endDate: Date;
 	planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '140credits/day' | 'month';
@@ -7,12 +8,14 @@ export class Subscription {
 	availableCredits:number;
 
 	constructor({
+		sid,
 		startDate,
 		endDate,
 		planType,
 		isActive,
 		totalCredits,
 	}: {
+		sid:string|null,
 		startDate: Date;
 		endDate: Date;
 		planType: 'basic' | 'ownAPI' | '20credits/day' | '60credits/day' | '140credits/day' | 'month';
@@ -29,5 +32,6 @@ export class Subscription {
 		}
 		this.totalCredits=totalCredits;
 		this.availableCredits=totalCredits;
+		this.sid=sid;
 	}
 }

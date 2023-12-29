@@ -18,6 +18,8 @@
 		getVisionAPIResponse,
 		getVisionAPIResponseWithoutImage
 	} from '../../services/llmService';
+	import { doc, updateDoc } from 'firebase/firestore';
+	import { userData } from '$lib/stores/user/userStore';
 	let waiting = false;
 	let waitingExtra = false;
 	let displayError = '';
@@ -152,6 +154,10 @@
 			displayError = 'Could not save Vision API Response. Please try again.';
 			return displayError;
 		}
+		const sub = await updateDoc(
+			doc(db, `users/${$userData.id}/subscriptionDetals/${$userData.subscriptionDetails.sid}`),
+			{}
+		);
 		goto(`/chats/${chatsRef.id}`);
 	}
 	async function createNewChatFromMessage() {

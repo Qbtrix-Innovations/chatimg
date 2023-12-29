@@ -60,10 +60,12 @@ export class FirebaseUserAdapter implements UserRepository {
 			const subs: Subscription[] = [];
 			subDocs.forEach((doc) => {
 				const data: Subscription = doc.data() as Subscription;
+				data.sid=doc.id;
 				subs.push(data);
 			});
 			if (subs.length===0) {
 				subs.push({
+					sid:'newSubscription',
 					startDate: new Date(),
 					endDate: new Date(new Date().getTime() + 1 * 30 * 24 * 60 * 60 * 1000),
 					planType: 'basic',
@@ -86,6 +88,7 @@ export class FirebaseUserAdapter implements UserRepository {
 				isPremium: userDoc?.isPremium,
 				stripeCustomerId: userDoc?.stripeCustomerId,
 				subscriptionDetails: {
+					sid:subs[0].sid,
 					startDate: subs[0].startDate,
 					endDate: subs[0].endDate,
 					planType: subs[0].planType,
@@ -117,10 +120,12 @@ export class FirebaseUserAdapter implements UserRepository {
 			const subs: Subscription[] = [];
 			subDocs.forEach((doc) => {
 				const data: Subscription = doc.data() as Subscription;
+				data.sid=doc.id;
 				subs.push(data);
 			});
 			if (subs.length===0) {
 				subs.push({
+					sid:"newSubscription",
 					startDate: new Date(),
 					endDate: new Date(new Date().getTime() + 1 * 30 * 24 * 60 * 60 * 1000),
 					planType: 'basic',
@@ -143,6 +148,7 @@ export class FirebaseUserAdapter implements UserRepository {
 				isPremium: userDoc?.isPremium,
 				stripeCustomerId: userDoc?.stripeCustomerId,
 				subscriptionDetails: {
+					sid:subs[0].sid,
 					startDate: subs[0].startDate,
 					endDate: subs[0].endDate,
 					planType: subs[0].planType,

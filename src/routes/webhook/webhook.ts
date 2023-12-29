@@ -46,6 +46,7 @@ export const POST: RequestHandler = async ({request}) => {
                 planType:"month",
                 isActive:true,
                 totalCredits:500,
+                availableCredits:500
               });   
               break;
             case 300:
@@ -55,6 +56,7 @@ export const POST: RequestHandler = async ({request}) => {
                 planType:"20credits/day",
                 isActive:true,
                 totalCredits:20,
+                availableCredits:20,
               });
             break;
             case 500:
@@ -64,6 +66,7 @@ export const POST: RequestHandler = async ({request}) => {
                 planType:"60credits/day",
                 isActive:true,
                 totalCredits:60,
+                availableCredits:60,
               });
             break;
             case 1200:
@@ -73,6 +76,7 @@ export const POST: RequestHandler = async ({request}) => {
                 planType:"140credits/day",
                 isActive:true,
                 totalCredits:140,
+                availableCredits:140,
               });
             break;
             default:
