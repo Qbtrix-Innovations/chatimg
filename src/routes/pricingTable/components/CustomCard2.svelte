@@ -1,31 +1,32 @@
-<script lang="ts" >
+<script lang="ts">
 	import { goto } from '$app/navigation';
+	import PrimaryButton from '$lib/components/primaryButton.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { db } from '$lib/firebase/firebase';
 	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
 	import { doc, updateDoc } from 'firebase/firestore';
 	import { CheckCircle2, TentTree } from 'lucide-svelte';
-	export let h1:string;
-	export let h2:string;
-	export let buttonText:string;
-	export let icn:any;
-	let plan:"20credits/day"|"60credits/day"|"140credits/day" = '20credits/day';
+	export let h1: string;
+	export let h2: string;
+	export let buttonText: string;
+	export let icn: any;
+	let plan: '20credits/day' | '60credits/day' | '140credits/day' = '20credits/day';
 	let bullet1 = '20 Credits - 1 credit = 1 chat.';
 	$: {
 		bullet1 = `${
 			plan === '20credits/day' ? '20' : plan === '60credits/day' ? '60' : '140'
 		} Credits - 1 credit = 1 chat.`;
 	}
-	let bullets:string[] = [bullet1, 'Chat with Image','Create Image'];
+	let bullets: string[] = [bullet1, 'Chat with Image', 'Create Image'];
 	$: {
-		bullets = [bullet1, 'Chat with Image','Create Image'];
+		bullets = [bullet1, 'Chat with Image', 'Create Image'];
 	}
 </script>
 
-<div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4')}>
+<div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4 max-w-[400px]')}>
 	<div class={clsx('flex flex-row justify-evenly')}>
-		<TentTree size=40 />
+		<TentTree size="40" />
 		<div class={clsx('font-bold text-[32px] leading-10 text-[#0b0914] w-3/4')}>
 			{h1}
 		</div>
@@ -37,7 +38,7 @@
 		{#each bullets as bullet}
 			<div class={clsx('flex flex-row my-2')}>
 				<div>
-					<CheckCircle2 fill="#35353f" color="white"/>
+					<CheckCircle2 fill="#35353f" color="white" />
 				</div>
 				<div>
 					{bullet}
@@ -95,17 +96,18 @@
 			<div>140 Credits</div>
 		</div>
 	</div>
-	<form action="?/createDailyCheckoutSession" method="post">
-		<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
-		<input type="hidden" name="type" bind:value={plan} />
-		<input type="hidden" name="csrf_token" value="your_generated_csrf_token">
-		<Button
-			type="submit"
-			class={clsx(
-				'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
-			)}
-		>
-			{buttonText}
-		</Button>
-	</form>
+	<div class="flex flex-col w-full h-full justify-end">
+		<form action="?/createDailyCheckoutSession" method="post" class="w-full">
+			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
+			<input type="hidden" name="type" bind:value={plan} />
+			<input type="hidden" name="csrf_token" value="your_generated_csrf_token" />
+			<PrimaryButton
+				type="submit"
+				class={clsx(
+					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl self-center w-full'
+				)}
+				text={buttonText}
+			/>
+		</form>
+	</div>
 </div>

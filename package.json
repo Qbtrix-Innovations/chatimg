@@ -12,6 +12,8 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@fontsource-variable/inter": "^5.0.16",
+		"@fontsource/fira-sans": "^5.0.18",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.30.3",
 		"autoprefixer": "^10.4.14",
@@ -40,6 +42,7 @@
 		"formsnap": "^0.4.1",
 		"langchain": "^0.0.210",
 		"lucide-svelte": "^0.292.0",
+		"mode-watcher": "^0.1.2",
 		"openai": "^4.21.0",
 		"stripe": "^14.9.0",
 		"svelte-french-toast": "^1.2.0",

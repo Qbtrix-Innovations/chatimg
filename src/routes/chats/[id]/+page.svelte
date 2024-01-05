@@ -242,7 +242,7 @@
 </script>
 
 <div class={clsx('bg-[#f5f5f5] h-[100vh]')}>
-	<div class={clsx('flex flex-col w-screen justify-between items-center')}>
+	<div class={clsx('flex flex-col  justify-between items-center')}>
 		<div class={clsx('flex flex-col w-full items-center')}>
 			<CommonNavbar
 				leftProfile={false}

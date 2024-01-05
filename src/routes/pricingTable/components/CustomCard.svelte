@@ -1,22 +1,23 @@
-<script lang="ts" >
+<script lang="ts">
 	import { Bot, CalendarDays, CheckCircle2, XCircle } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { userData } from '$lib/stores/user/userStore';
 	import clsx from 'clsx';
 	import { goto } from '$app/navigation';
-	export let onClick:()=>void;
+	import PrimaryButton from '$lib/components/primaryButton.svelte';
+	export let onClick: () => void;
 	const buttonClicked = async () => {
 		onClick();
 	};
-	export let bullets:any;
-	export let h1:string;
-	export let h2:string;
-	export let price:number;
-	export let unitTime:string;
-	export let buttonText:string;
+	export let bullets: any;
+	export let h1: string;
+	export let h2: string;
+	export let price: number;
+	export let unitTime: string;
+	export let buttonText: string;
 </script>
 
-<div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4')}>
+<div class={clsx('rounded-[20px] border-[#d4d4d4] border flex flex-col p-4 my-4 max-w-[400px]')}>
 	<div class={clsx('flex flex-row justify-evenly')}>
 		<div class={clsx('text-black')}>
 			{#if price === 0}
@@ -56,35 +57,35 @@
 			class={clsx('font-normal text-[18px] leading-10 text-[#0b0914]')}>/{unitTime}</span
 		>
 	</div>
-	{#if price === 0}
-		<!-- <form action="?/ownAPICheckoutSession" method="post">
+	<div class="flex flex-col w-full h-full justify-end">
+		{#if price === 0}
+			<!-- <form action="?/ownAPICheckoutSession" method="post">
 			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
 			<input type="hidden" name="lookup_key" value="Monthly Subscription" /> -->
-			<Button
+			<PrimaryButton
 				id="checkout-and-portal-button"
 				type="submit"
-				on:click={()=>{goto('/userProfile')}}
+				onClick={() => {
+					goto('/userProfile');
+				}}
 				class={clsx(
-					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
+					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl self-center w-full'
 				)}
-			>
-				{buttonText}
-			</Button>
-		<!-- </form> -->
-	{:else}
-		<form action="?/createCheckoutSession" method="post">
-			<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
-			<input type="hidden" name="lookup_key" value="Monthly Subscription" />
-			<input type="hidden" name="csrf_token" value="your_generated_csrf_token">
-			<Button
-				id="checkout-and-portal-button"
-				type="submit"
-				class={clsx(
-					'bg-[rgba(76,175,80,1)] hover:bg-[rgba(76,175,80,0.8)] rounded-xl w-[90%] self-center'
-				)}
-			>
-				{buttonText}
-			</Button>
-		</form>
-	{/if}
+				text={buttonText}
+			/>
+			<!-- </form> -->
+		{:else}
+			<form action="?/createCheckoutSession" method="post" class="w-full">
+				<input type="hidden" name="userInfo" value={JSON.stringify($userData)} />
+				<input type="hidden" name="lookup_key" value="Monthly Subscription" />
+				<input type="hidden" name="csrf_token" value="your_generated_csrf_token" />
+				<PrimaryButton
+					id="checkout-and-portal-button"
+					type="submit"
+					class={clsx(' w-full')}
+					text={buttonText}
+				/>
+			</form>
+		{/if}
+	</div>
 </div>

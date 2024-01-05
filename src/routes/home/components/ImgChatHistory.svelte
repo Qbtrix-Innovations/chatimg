@@ -11,8 +11,8 @@
 	};
 </script>
 
-<div class="flex flex-col w-full mt-4 hover:opacity-100 active:opacity-100" on:click={onClick} >
-	<div class="flex flex-row items-center w-full ml-[16px]">
+<button class="flex flex-col w-full mt-4 hover:opacity-100 active:opacity-100" on:click={onClick} >
+	<div class="flex flex-row items-center w-full px-4">
 		<img
 			src={url}
 			alt=""
@@ -30,4 +30,4 @@
 		</div>
 	</div>
 	<hr class="w-full mt-2 border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]" />
-</div>
+</button>

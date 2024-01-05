@@ -222,7 +222,7 @@
 </script>
 
 <div class="bg-[#f5f5f5] h-screen flex flex-col">
-	<div class="font-semibold text-[14px] text-[#263238] mt-2 ml-4 flex flex-row justify-between">
+	<div class="font-semibold text-[14px] text-[#263238] mt-2 px-4 flex flex-row justify-between">
 		<div>
 			Chat Img
 			{#if userName}

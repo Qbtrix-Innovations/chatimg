@@ -20,37 +20,37 @@
 	}
 </script>
 
-<div
+<button
 	class={clsx('flex fixed flex-row w-[90%] justify-center items-center rounded-[21px]', className)}
 	on:click={initialNavigationToNewChat}
 >
-	<div
-		class={clsx(
-			'h-10 w-10 flex bg-[#4caf50] m-2 pb-2 px-2 rounded-full align-middle text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] '
-		)}
-	>
-		<label>
-			+
-			<input
-				type="file"
-				accept="image/*;pdf/*"
-				name="file"
-				on:change={(e) => {
-					// @ts-ignore
-					file = e.target?.files[0];
-				}}
-				class="hidden"
-			/>
-		</label>
-	</div>
+<div
+    class={clsx(
+        'h-10 w-10 flex bg-[linear-gradient(180deg,#4CAF50_0%,#3F9A43_100%)] m-2 pb-2 px-2 rounded-full justify-center align-middle text-center hover:bg-[rgba(76,175,80,0.8)] leading-9 font-medium text-[30px] text-[#ffffff] shadow-lg shadow-black/25'
+    )}
+>
+    <label class="flex items-center justify-center mt-[1px]">
+        +
+        <input
+            type="file"
+            accept="image/*;pdf/*"
+            name="file"
+            on:change={(e) => {
+                // @ts-ignore
+                file = e.target?.files[0];
+            }}
+            class="hidden"
+        />
+    </label>
+</div>
 	<Input
 		class={clsx(
-			'sm:pl-10 sm:pr-12 px-10 w-[90%] rounded-[21px] h-[42px] bg-white shadow-[0px_3px_3.2px_0px_#D2D2D224] text-[#607D8B] leading-4 items-center text-[14px]'
+			'sm:pl-10 sm:pr-12 px-10 w-[90%] rounded-[21px] h-[42px] bg-white shadow-[0px_3px_3.2px_0px_#D2D2D224] text-[#607D8B] leading-4 items-center text-[14px] border-none placeholder:text-[#607D8B]/50'
 		)}
 		placeholder="Type here ..."
 		bind:value={inpVal}
 	/>
-	<Button class="bg-transparent absolute sm:ml-[85%] ml-[85%]" on:click={sentClicked}>
+	<Button class="bg-transparent hover:bg-transparent absolute sm:ml-[90%] ml-[82%]" on:click={sentClicked}>
 		<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
 				fill-rule="evenodd"
@@ -60,4 +60,4 @@
 			/>
 		</svg>
 	</Button>
-</div>
+</button>

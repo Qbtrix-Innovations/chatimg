@@ -50,9 +50,7 @@
 		creditsLeft="3"
 		passType="basic"
 	/>
-	<hr
-		class="w-full fixed mt-[40px] border-[0.6px] bg-[rgba(218,218,218,1)] border-[rgba(218,218,218,1)]"
-	/>
+
 	<div class="flex flex-col mt-[40px]">
 		{#each $chatsData as chat}
 			{#if chat.images.length === 0}
@@ -60,7 +58,7 @@
 					on:click={() => {
 						goto(`/chats/${chat.id}`);
 					}}
-					class={`w-screen`}
+					class={`w-full`}
 				>
 					<TextChatHistory
 						chatId={chat.id}
@@ -73,7 +71,7 @@
 					on:click={() => {
 						goto(`/chats/${chat.id}`);
 					}}
-					class={`w-screen`}
+					class={`w-full`}
 				>
 					<ImgChatHistory
 						chatId={chat.id}
