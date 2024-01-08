@@ -1,7 +1,13 @@
-<div>
+<script>
+	import '@fontsource-variable/inter';
+</script>
 
-</div>
-<slot/>
-<div>
-    
-</div>
+<div></div>
+<slot />
+<div></div>
+
+<style>
+    body {
+        font-family: 'Inter Variable', sans-serif;
+    }
+</style>

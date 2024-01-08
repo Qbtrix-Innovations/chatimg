@@ -32,8 +32,8 @@
 	export let passType: string;
 </script>
 
-<nav class={clsx('w-full fixed flex flex-row justify-between align-middle  py-2')}>
-	<div class={clsx('flex flex-row justify-evenly align-middle items-center')}>
+<nav class={clsx('w-full flex flex-row justify-between   py-2 px-4')}>
+	<div class={clsx('flex   items-center')}>
 		{#if leftProfile}
 			<ProfileButton />
 		{:else}
