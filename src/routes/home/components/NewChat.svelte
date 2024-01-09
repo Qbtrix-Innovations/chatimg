@@ -18,6 +18,7 @@
 		getVisionAPIResponse,
 		getVisionAPIResponseWithoutImage
 	} from '../../../services/llmService';
+	import { userData } from '$lib/stores/user/userStore';
 	let waiting = false;
 	let waitingExtra = false;
 	let displayError = '';
@@ -154,6 +155,11 @@
 		}
 		goto(`/chats/${chatsRef.id}`);
 	}
+	let isUserLoggedIn: boolean = true;
+	$: console.log($userData);
+	if ($userData.id === '') {
+		isUserLoggedIn = false;
+	}
 	async function createNewChatFromMessage() {
 		if (messageVal.length > 0) {
 			try {
@@ -228,7 +234,13 @@
 		<div class="flex w-full justify-center">
 			<MessageBar
 				onClickedNavigationToNewChat={false}
-				sentMessageClicked={createNewChatFromMessage}
+				sentMessageClicked={() => {
+					if(isUserLoggedIn){
+						createNewChatFromMessage();
+					} else {
+						goto('/auth');
+					}
+				}}
 				bind:file
 				bind:inpVal={messageVal}
 				class="max-w-[600px]"

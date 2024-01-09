@@ -82,7 +82,11 @@
 			{#if newChatButton}
 				<PrimaryButton onClick={createNewChat} class="h-[25px] mr-2" text="New Chat" />
 			{/if}
-			<ProfileButton />
+			{#if $userData.id !== ''}
+				<ProfileButton />
+			{:else}
+				<PrimaryButton onClick={() => goto('/auth')} class="h-[30px] mr-2" text="Login" />
+			{/if}
 		</div>
 	</nav>
 </header>

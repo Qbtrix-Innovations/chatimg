@@ -82,9 +82,9 @@
 	}
 </script>
 
-<section class="bg-card ">
+<section class="bg-card">
 	<div class="w-full hidden xl:block">
-		<Navbar newChatButton={false}/>
+		<Navbar {data} newChatButton={false} />
 	</div>
 	<div class="w-full xl:hidden block">
 		<ChatNav {data} />
@@ -94,7 +94,7 @@
 			<HistorySidebar {activeId} />
 		</div>
 		<div class="w-full hidden xl:flex">
-		<NewChat />
+			<NewChat />
 		</div>
 
 		<div class="hidden xl:block">

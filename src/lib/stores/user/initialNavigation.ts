@@ -23,11 +23,12 @@ async function checkStatus() {
     const chats:Chat[] = await getChatsFromParticipantId(currentUser.currentUser.uid);
     // if the user has previous chats then we go to chats page where his chat history will be displayed.
     // otherwise the user will go to new chat page.
-    if (chats.length > 0) {
-      goto('/home');
-    } else {
-      goto('/');
-    }
+    // if (chats.length > 0) {
+    //   goto('/home');
+    // } else {
+    //   goto('/');
+    // }
+    goto("/home")
   } else {
     toast(`Signup/Login failed`, {
       icon: '❌',
